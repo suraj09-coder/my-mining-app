@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INR Mining App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #121212; color: white; padding: 15px; text-align: center; }
+        .card { background: #1e1e1e; padding: 15px; margin: 15px 0; border-radius: 10px; border: 1px solid #333; }
+        button { background: #28a745; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #444; background: #222; color: white; }
+    </style>
+</head>
+<body>
+
+    <h2>⚡ Mining Dashboard</h2>
+    <div class="card">
+        <h3>Balance: ₹<span id="balance">0</span></h3>
+        <p>Plan Status: <strong id="plan">Free</strong></p>
+    </div>
+
+    <!-- Deposit Section -->
+    <div class="card">
+        <h3>Buy Paid Plan</h3>
+        <p>Scan QR & Send ₹100 to Unlock Daily Mining</p>
+        <img src="YOUR_UPI_QR_IMAGE_URL" width="150" alt="UPI QR">
+        <input type="text" id="utr" placeholder="Enter 12-Digit UTR Number">
+        <button onclick="submitDeposit()">Submit UTR for Approval</button>
+    </div>
+
+    <!-- Mining Section -->
+    <div class="card">
+        <h3>Daily Code Mining</h3>
+        <input type="text" id="miningCode" placeholder="Enter Daily Secret Code">
+        <button id="mineBtn" onclick="startMining()">Start 2-Hour Mining</button>
+        <p id="timer" style="color: #ffc107; font-weight: bold;"></p>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Supabase Credentials (Apni keys yahan dalein)
+        const SUPABASE_URL = "[https://zkmenolvmtkalgukoozc.supabase.co]";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprbWVub2x2bXRrYWxndWtvb3pjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MjE1NTAsImV4cCI6MjEwNDA5NzU1MH0.H5j0PG_0SQbquEiipDOm5c4KtMrmC30kiX33Oj9BZMM";
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const userId = tg.initDataUnsafe?.user?.id || 123456789; // Testing ID
+
+        async function loadUserData() {
+            let { data, error } = await supabase.from('users').select('*').eq('telegram_id', userId).single();
+            if (!data) {
+                await supabase.from('users').insert([{ telegram_id: userId }]);
+            } else {
+                document.getElementById('balance').innerText = data.balance;
+                document.getElementById('plan').innerText = data.plan_status;
+            }
+        }
+
+        async function submitDeposit() {
+            const utr = document.getElementById('utr').value;
+            if(!utr) return alert("UTR Number dalein!");
+            
+            const { error } = await supabase.from('deposits').insert([{ telegram_id: userId, utr_number: utr, amount: 100 }]);
+            if (error) alert("Error ya Duplicate UTR!");
+            else alert("Deposit Submitted! Admin verification ke baad Plan active hoga.");
+        }
+
+        async function startMining() {
+            const inputCode = document.getElementById('miningCode').value;
+            let { data: user } = await supabase.from('users').select('plan_status').eq('telegram_id', userId).single();
+            
+            if (user.plan_status !== 'Paid') {
+                return alert("Pehle Deposit karke Paid Plan lein!");
+            }
+
+            let { data: codeData } = await supabase.from('daily_codes').select('*').eq('secret_code', inputCode).eq('is_active', true).single();
+            if (!codeData) return alert("Galat Secret Code!");
+
+            document.getElementById('mineBtn').disabled = true;
+            let duration = 2 * 60 * 60; // 2 Hours in seconds
+
+            let timerInterval = setInterval(async () => {
+                let hours = Math.floor(duration / 3600);
+                let minutes = Math.floor((duration % 3600) / 60);
+                let seconds = duration % 60;
+                document.getElementById('timer').innerText = `Mining in progress: ${hours}h ${minutes}m ${seconds}s`;
+
+                if (duration <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timer').innerText = "Mining Finished!";
+                    
+                    // Add Balance
+                    let { data: u } = await supabase.from('users').select('balance').eq('telegram_id', userId).single();
+                    await supabase.from('users').update({ balance: Number(u.balance) + Number(codeData.reward_amount) }).eq('telegram_id', userId);
+                    alert(`Mining Completed! ₹${codeData.reward_amount} added to wallet.`);
+                    loadUserData();
+                }
+                duration--;
+            }, 1000);
+        }
+
+        loadUserData();
+    </script>
+</body>
+</html>
