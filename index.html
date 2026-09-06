@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gold Cyber-Robot App</title>
+  <title>Nobi Mining</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- SUPABASE JS LIBRARY -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --bg-gradient: radial-gradient(circle at top, #2c2006 0%, #0d0a03 60%, #050401 100%);
@@ -19,13 +21,8 @@
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
 
     body {
-      background: var(--bg-gradient);
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-      position: relative;
+      background: var(--bg-gradient); color: var(--text-main);
+      display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative;
     }
 
     .bg-robot-container {
@@ -43,7 +40,7 @@
       100% { transform: translateY(15px) scale(1.05); opacity: 0.22; }
     }
 
-    /* ATTRACTIVE LUXURY AUTH SCREEN */
+    /* AUTH OVERLAY */
     .auth-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(5, 4, 1, 0.98); z-index: 999;
@@ -51,116 +48,66 @@
     }
 
     .auth-card {
-      width: 90%; max-width: 380px;
-      background: rgba(22, 17, 6, 0.85);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--gold-accent);
-      border-radius: 28px; padding: 25px 20px;
-      box-shadow: 0 0 30px rgba(243, 186, 47, 0.25), inset 0 0 15px rgba(243, 186, 47, 0.1);
-      position: relative; text-align: center; overflow: hidden;
+      width: 90%; max-width: 380px; background: rgba(22, 17, 6, 0.85);
+      backdrop-filter: blur(20px); border: 1px solid var(--gold-accent);
+      border-radius: 28px; padding: 25px 20px; text-align: center;
+      box-shadow: 0 0 30px rgba(243, 186, 47, 0.25);
     }
 
-    /* TAB SWITCHER */
-    .auth-tabs {
-      display: flex; background: rgba(0, 0, 0, 0.6);
-      border-radius: 18px; padding: 4px; border: 1px solid var(--border-gold);
-      margin-bottom: 20px;
-    }
-    .auth-tab {
-      flex: 1; padding: 10px; border-radius: 14px; font-size: 13px; font-weight: bold;
-      color: var(--text-sub); cursor: pointer; transition: all 0.3s ease;
-    }
-    .auth-tab.active {
-      background: var(--gold-btn); color: #000;
-      box-shadow: 0 4px 15px rgba(243, 186, 47, 0.4);
-    }
+    .auth-tabs { display: flex; background: rgba(0,0,0,0.6); border-radius: 18px; padding: 4px; border: 1px solid var(--border-gold); margin-bottom: 20px; }
+    .auth-tab { flex: 1; padding: 10px; border-radius: 14px; font-size: 13px; font-weight: bold; color: var(--text-sub); cursor: pointer; transition: all 0.3s; }
+    .auth-tab.active { background: var(--gold-btn); color: #000; box-shadow: 0 4px 15px rgba(243, 186, 47, 0.4); }
 
-    /* INPUT GROUPS WITH ICONS */
-    .input-group {
-      position: relative; margin-bottom: 14px;
-    }
-    .input-icon {
-      position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
-      font-size: 16px; color: var(--gold-accent);
-    }
-    .input-box {
-      width: 100%; padding: 14px 14px 14px 45px;
-      border-radius: 16px; border: 1px solid var(--border-gold);
-      background: rgba(0, 0, 0, 0.7); color: #fff;
-      font-size: 14px; outline: none; transition: border-color 0.3s;
-    }
-    .input-box:focus {
-      border-color: var(--gold-accent);
-      box-shadow: 0 0 10px rgba(243, 186, 47, 0.3);
-    }
+    .input-group { position: relative; margin-bottom: 14px; }
+    .input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--gold-accent); }
+    .input-box { width: 100%; padding: 14px 14px 14px 45px; border-radius: 16px; border: 1px solid var(--border-gold); background: rgba(0, 0, 0, 0.7); color: #fff; font-size: 14px; outline: none; }
+    .input-box:focus { border-color: var(--gold-accent); box-shadow: 0 0 10px rgba(243, 186, 47, 0.3); }
 
-    /* APP CONTENT - HIDDEN BY DEFAULT */
+    .btn-gold { background: var(--gold-btn); color: #000; border: none; padding: 14px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 100%; box-shadow: 0 4px 15px rgba(243, 186, 47, 0.3); }
+    .btn-gold:active { transform: scale(0.96); }
+
+    /* APP WRAPPER */
     .app-wrapper { display: none; flex: 1; flex-direction: column; height: 100%; position: relative; }
     .content { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 95px; z-index: 2; }
     .page { display: none; width: 100%; flex-direction: column; }
     .page.active { display: flex; }
 
     .navbar {
-      position: fixed; bottom: 15px; left: 4%; width: 92%;
-      background: rgba(25, 20, 8, 0.95); backdrop-filter: blur(15px);
-      border: 1px solid var(--border-gold); border-radius: 30px;
-      display: flex; justify-content: space-around; padding: 12px 0;
-      z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      position: fixed; bottom: 15px; left: 4%; width: 92%; background: rgba(25, 20, 8, 0.95);
+      backdrop-filter: blur(15px); border: 1px solid var(--border-gold); border-radius: 30px;
+      display: flex; justify-content: space-around; padding: 12px 0; z-index: 100;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
     }
     .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); font-size: 11px; cursor: pointer; }
     .nav-item.active { color: var(--gold-accent); font-weight: bold; text-shadow: 0 0 10px var(--gold-accent); }
     .nav-icon { font-size: 18px; margin-bottom: 2px; }
 
-    .btn-gold {
-      background: var(--gold-btn); color: #000; border: none;
-      padding: 14px 20px; border-radius: 20px; font-weight: bold; cursor: pointer;
-      box-shadow: 0 4px 15px rgba(243, 186, 47, 0.3); transition: transform 0.1s;
-    }
-    .btn-gold:active { transform: scale(0.96); }
-
-    .gold-card {
-      background: var(--card-gold); border: 1px solid var(--border-gold);
-      border-radius: 24px; padding: 18px; margin-bottom: 15px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.6); position: relative;
-    }
-
+    .gold-card { background: var(--card-gold); border: 1px solid var(--border-gold); border-radius: 24px; padding: 18px; margin-bottom: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); position: relative; }
     .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-    .action-card {
-      border-radius: 24px; padding: 20px 15px; display: flex; flex-direction: column;
-      justify-content: space-between; height: 110px; font-size: 16px; font-weight: 600;
-      border: 1px solid var(--border-gold); cursor: pointer;
-    }
-
+    .action-card { border-radius: 24px; padding: 20px 15px; display: flex; flex-direction: column; justify-content: space-between; height: 110px; font-size: 16px; font-weight: 600; border: 1px solid var(--border-gold); cursor: pointer; }
     .menu-item { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid rgba(243, 186, 47, 0.1); font-size: 14px; cursor: pointer; }
 
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; padding: 20px;
-    }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; padding: 20px; }
   </style>
 </head>
 <body>
 
   <div class="bg-robot-container"><div class="bg-robot">🤖</div></div>
 
-  <!-- ATTRACTIVE AUTH SCREEN OVERLAY -->
+  <!-- ATTRACTIVE AUTH OVERLAY -->
   <div class="auth-overlay" id="authOverlay">
     <div class="auth-card">
-      
-      <!-- LOGO / HEADER -->
       <div style="font-size: 55px; filter: drop-shadow(0 0 15px var(--gold-accent)); margin-bottom: 8px;">🤖</div>
-      <h2 style="color:var(--gold-accent); font-size: 20px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 18px;">CYBER ROBOT</h2>
+      <h2 style="color:var(--gold-accent); font-size: 20px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 18px;">NOBI MINING AI</h2>
 
-      <!-- LOGIN / SIGNUP TABS -->
       <div class="auth-tabs">
         <div class="auth-tab active" id="tabLogin" onclick="setAuthMode(false)">Login</div>
         <div class="auth-tab" id="tabSignup" onclick="setAuthMode(true)">Sign Up</div>
       </div>
 
-      <!-- INPUT FIELDS -->
       <div class="input-group">
         <span class="input-icon">📱</span>
-        <input type="text" class="input-box" id="authMobile" placeholder="Phone Number / User ID">
+        <input type="text" class="input-box" id="authMobile" placeholder="Phone Number / Telegram ID">
       </div>
 
       <div class="input-group">
@@ -168,19 +115,16 @@
         <input type="password" class="input-box" id="authPass" placeholder="Password">
       </div>
 
-      <button class="btn-gold" style="width: 100%; font-size: 15px; margin-top: 5px;" id="authBtn" onclick="processAuth()">LOGIN ACCESS</button>
+      <button class="btn-gold" id="authBtn" onclick="processAuth()">LOGIN ACCESS</button>
 
-      <!-- SECURITY FOOTER -->
       <p style="font-size: 11px; color: var(--text-sub); margin-top: 18px; display: flex; align-items: center; justify-content: center; gap: 5px;">
         <span>🛡️</span> 256-Bit Encrypted Secure Network
       </p>
-
     </div>
   </div>
 
   <!-- MAIN APP WRAPPER -->
   <div class="app-wrapper" id="appWrapper">
-
     <div class="content">
 
       <!-- 1. HOME PAGE -->
@@ -209,7 +153,7 @@
         <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 8px;">Hot News</p>
         <div class="gold-card" style="padding: 12px 18px; display: flex; align-items: center; gap: 10px; font-size: 12px;">
           <span>📰</span>
-          <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-sub);">TGS AI Robotics tops global automated revenue rankings for 2026!</span>
+          <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-sub);">Nobi Mining AI Robotics tops global automated revenue rankings!</span>
           <span style="color: var(--gold-accent);">→</span>
         </div>
       </div>
@@ -226,7 +170,7 @@
               Price: <strong style="color: #fff;">₹2,000</strong><br>
               Daily revenue: <strong style="color: #00ff66;">₹50 / day</strong>
             </div>
-            <button class="btn-gold" onclick="selectPlan('Nobi10', 2000)">BUY VIP 1</button>
+            <button class="btn-gold" style="width:auto;" onclick="selectPlan('Nobi10', 2000)">BUY VIP 1</button>
           </div>
         </div>
 
@@ -238,7 +182,7 @@
               Price: <strong style="color: #fff;">₹5,000</strong><br>
               Daily revenue: <strong style="color: #00ff66;">₹120 / day</strong>
             </div>
-            <button class="btn-gold" onclick="selectPlan('Nobi50', 5000)">BUY VIP 2</button>
+            <button class="btn-gold" style="width:auto;" onclick="selectPlan('Nobi50', 5000)">BUY VIP 2</button>
           </div>
         </div>
       </div>
@@ -255,8 +199,8 @@
         </div>
 
         <div style="display: flex; gap: 10px;">
-          <button class="btn-gold" style="flex: 1;" onclick="startMining()">⏻ Start Miner</button>
-          <button class="btn-gold" style="flex: 1; background: #333; color: #fff;" onclick="claimIncome()">Receive Revenue</button>
+          <button class="btn-gold" onclick="startMining()">⏻ Start Miner</button>
+          <button class="btn-gold" style="background: #333; color: #fff;" onclick="claimIncome()">Receive Revenue</button>
         </div>
       </div>
 
@@ -271,7 +215,7 @@
           </div>
 
           <input type="text" id="refLinkInput" class="input-box" readonly style="font-size: 11px; text-align: center; padding-left: 14px;">
-          <button class="btn-gold" style="width: 100%; margin-top: 10px;" onclick="copyLink()">Copy Invite Link</button>
+          <button class="btn-gold" style="margin-top: 10px;" onclick="copyLink()">Copy Invite Link</button>
         </div>
       </div>
 
@@ -280,9 +224,9 @@
         <div class="gold-card">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-              <span style="background: var(--gold-btn); color: #000; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: bold;" id="userVipTag">Nobi10</span>
+              <span style="background: var(--gold-btn); color: #000; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: bold;" id="userVipTag">Free Plan</span>
               <h2 style="margin-top: 6px; color: #fff;" id="profileName">User</h2>
-              <p style="font-size: 11px; color: var(--text-sub);" id="profileId">(****00000)</p>
+              <p style="font-size: 11px; color: var(--text-sub);" id="profileId">(****0000)</p>
             </div>
             <div style="font-size: 45px;">👤</div>
           </div>
@@ -298,14 +242,13 @@
           <div class="menu-item" onclick="openModal('redeemModal')"><span>👥 Redemption code</span><span style="color:var(--gold-accent);">→</span></div>
           <div class="menu-item" onclick="alert('No detailed transactions yet!')"><span>📊 Revenue Details</span><span style="color: var(--gold-accent);">0.00 →</span></div>
           <div class="menu-item" onclick="openModal('withdrawModal')"><span>💳 Bank & Wallet Address</span><span style="color:var(--gold-accent);">→</span></div>
-          <div class="menu-item" onclick="alert('Security features active.')"><span>⚙️ Set up</span><span style="color:var(--gold-accent);">→</span></div>
           <div class="menu-item" onclick="logout()" style="color: #ff4757;"><span>🚪 Log out</span><span>→</span></div>
         </div>
       </div>
 
     </div>
 
-    <!-- WITHDRAWAL MODAL -->
+    <!-- WITHDRAWAL MODAL (MINIMUM ₹650 UPDATED) -->
     <div class="modal" id="withdrawModal">
       <div class="gold-card" style="width: 90%; text-align: center;">
         <h3 style="color: var(--gold-accent); margin-bottom: 10px;">Bank / UPI Withdrawal</h3>
@@ -313,9 +256,9 @@
         <input type="text" class="input-box" style="padding-left:14px;" placeholder="UPI ID (e.g. name@upi)">
         <input type="text" class="input-box" style="padding-left:14px;" placeholder="Bank Account Number">
         <input type="text" class="input-box" style="padding-left:14px;" placeholder="IFSC Code">
-        <input type="number" class="input-box" style="padding-left:14px;" placeholder="Amount (Min ₹100)">
-        <button class="btn-gold" style="width: 100%; margin-top: 8px;" onclick="submitWithdraw()">Submit Withdrawal</button>
-        <button class="btn-gold" style="width: 100%; background: #333; color: #fff; margin-top: 6px;" onclick="closeModal('withdrawModal')">Cancel</button>
+        <input type="number" class="input-box" style="padding-left:14px;" id="withdrawAmtInput" placeholder="Amount (Min ₹650)">
+        <button class="btn-gold" style="margin-top: 8px;" onclick="submitWithdraw()">Submit Withdrawal</button>
+        <button class="btn-gold" style="background: #333; color: #fff; margin-top: 6px;" onclick="closeModal('withdrawModal')">Cancel</button>
       </div>
     </div>
 
@@ -328,8 +271,8 @@
           YOUR_UPI_ID_HERE
         </div>
         <input type="text" class="input-box" style="padding-left:14px;" id="utrInput" placeholder="Enter 12-Digit UTR Number">
-        <button class="btn-gold" style="width: 100%; margin-top: 8px;" onclick="submitUTR()">Submit Payment UTR</button>
-        <button class="btn-gold" style="width: 100%; background: #333; color: #fff; margin-top: 6px;" onclick="closeModal('paymentModal')">Close</button>
+        <button class="btn-gold" style="margin-top: 8px;" onclick="submitUTR()">Submit Payment UTR</button>
+        <button class="btn-gold" style="background: #333; color: #fff; margin-top: 6px;" onclick="closeModal('paymentModal')">Close</button>
       </div>
     </div>
 
@@ -338,8 +281,8 @@
       <div class="gold-card" style="width: 90%; text-align: center;">
         <h3 style="color: var(--gold-accent);">Redemption Code</h3>
         <input type="text" class="input-box" style="padding-left:14px;" placeholder="Enter Gift Code">
-        <button class="btn-gold" style="width: 100%; margin-top: 8px;" onclick="alert('Code Redeemed!'); closeModal('redeemModal');">Redeem</button>
-        <button class="btn-gold" style="width: 100%; background: #333; color: #fff; margin-top: 6px;" onclick="closeModal('redeemModal')">Close</button>
+        <button class="btn-gold" style="margin-top: 8px;" onclick="alert('Code Redeemed!'); closeModal('redeemModal');">Redeem</button>
+        <button class="btn-gold" style="background: #333; color: #fff; margin-top: 6px;" onclick="closeModal('redeemModal')">Close</button>
       </div>
     </div>
 
@@ -355,60 +298,70 @@
   </div>
 
   <script>
+    // ⚙️ APNI SUPABASE DETAILS YAHAN REPLACE KARO
+    const SUPABASE_URL = "https://zkmenolvmtkalgukoozc.supabase.co"; 
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprbWVub2x2bXRrYWxndWtvb3pjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MjE1NTAsImV4cCI6MjEwNDA5NzU1MH0.H5j0PG_0SQbquEiipDOm5c4KtMrmC30kiX33Oj9BZMM"; 
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     let isSignupMode = false;
+    let currentUser = null;
 
     function setAuthMode(signup) {
       isSignupMode = signup;
-      let tabLogin = document.getElementById('tabLogin');
-      let tabSignup = document.getElementById('tabSignup');
-      let authBtn = document.getElementById('authBtn');
-
-      if(isSignupMode) {
-        tabSignup.classList.add('active');
-        tabLogin.classList.remove('active');
-        authBtn.innerText = "CREATE ACCOUNT";
-      } else {
-        tabLogin.classList.add('active');
-        tabSignup.classList.remove('active');
-        authBtn.innerText = "LOGIN ACCESS";
-      }
+      document.getElementById('tabSignup').classList.toggle('active', signup);
+      document.getElementById('tabLogin').classList.toggle('active', !signup);
+      document.getElementById('authBtn').innerText = signup ? "CREATE ACCOUNT" : "LOGIN ACCESS";
     }
 
-    function processAuth() {
+    // SUPABASE SIGNUP & LOGIN
+    async function processAuth() {
       let mobile = document.getElementById('authMobile').value.trim();
       let pass = document.getElementById('authPass').value.trim();
 
-      if(!mobile || !pass) {
+      if (!mobile || !pass) {
         alert("Please enter both Phone/Username and Password!");
         return;
       }
 
-      if(isSignupMode) {
-        localStorage.setItem("user_" + mobile, pass);
-        alert("Account Created Successfully! Switch to Login tab.");
-        setAuthMode(false);
-      } else {
-        let savedPass = localStorage.getItem("user_" + mobile);
-        if(savedPass && savedPass === pass) {
-          loginSuccess(mobile);
-        } else if(!savedPass && mobile.length >= 4) {
-          localStorage.setItem("user_" + mobile, pass);
-          loginSuccess(mobile);
+      if (isSignupMode) {
+        const { data, error } = await _supabase
+          .from('users')
+          .insert([{ telegram_id: mobile, balance: 0.00, plan_status: 'Free' }]);
+
+        if (error) {
+          alert("Signup Error: " + error.message);
         } else {
-          alert("Invalid Phone/Username or Password!");
+          alert("Account Created Successfully! You can login now.");
+          setAuthMode(false);
+        }
+      } else {
+        const { data: user, error } = await _supabase
+          .from('users')
+          .select('*')
+          .eq('telegram_id', mobile)
+          .single();
+
+        if (user) {
+          currentUser = user;
+          loginSuccess(user);
+        } else {
+          alert("User not found! Please Sign Up first.");
         }
       }
     }
 
-    function loginSuccess(username) {
+    function loginSuccess(userData) {
       document.getElementById('authOverlay').style.display = 'none';
       document.getElementById('appWrapper').style.display = 'flex';
 
-      document.getElementById('displayTgName').innerText = username;
-      document.getElementById('profileName').innerText = username;
-      document.getElementById('profileId').innerText = "(****" + String(username).slice(-4) + ")";
+      document.getElementById('displayTgName').innerText = userData.telegram_id;
+      document.getElementById('profileName').innerText = userData.telegram_id;
+      document.getElementById('profileId').innerText = "(****" + String(userData.telegram_id).slice(-4) + ")";
 
-      let refLink = "https://t.me/YourBotName_bot?start=" + username;
+      document.getElementById('userVipTag').innerText = userData.plan_status || 'Free';
+      document.getElementById('userBal').innerText = "₹" + parseFloat(userData.balance || 0).toFixed(2);
+
+      let refLink = "https://t.me/NobiMining_bot?start=" + userData.telegram_id;
       document.getElementById('refLinkInput').value = refLink;
       document.getElementById('dynamicQR').src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encodeURIComponent(refLink);
     }
@@ -416,11 +369,8 @@
     function logout() {
       document.getElementById('appWrapper').style.display = 'none';
       document.getElementById('authOverlay').style.display = 'flex';
-      document.getElementById('authMobile').value = '';
-      document.getElementById('authPass').value = '';
+      currentUser = null;
     }
-
-    let balance = 0.00;
 
     function switchPage(pageId, element) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -444,17 +394,19 @@
       closeModal('paymentModal');
     }
 
+    // WITHDRAWAL FUNCTION WITH MINIMUM ₹650 CHECK
     function submitWithdraw() {
-      alert("Withdrawal request submitted! Admin will credit within 24 hours.");
+      let amt = parseFloat(document.getElementById('withdrawAmtInput').value);
+      if (isNaN(amt) || amt < 650) {
+        alert("Minimum withdrawal amount is ₹650!");
+        return;
+      }
+      alert("Withdrawal request of ₹" + amt + " submitted! Admin will credit within 24 hours.");
       closeModal('withdrawModal');
     }
 
     function startMining() { alert("Mining engine actively working!"); }
-    function claimIncome() {
-      balance += 50.00;
-      document.getElementById('userBal').innerText = "₹" + balance.toFixed(2);
-      alert("Revenue Collected!");
-    }
+    function claimIncome() { alert("Revenue Collected!"); }
 
     function copyLink() {
       let refInput = document.getElementById('refLinkInput');
