@@ -3,18 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VIP Mining & Earn Mini App</title>
+  <title>Robot Mining Mini App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      --bg-color: #0b0e14;
-      --card-bg: #161a23;
-      --card-border: rgba(243, 186, 47, 0.2);
+      --bg-color: #0a0c10;
+      --card-bg: #141822;
       --accent-gold: #f3ba2f;
-      --accent-glow: rgba(243, 186, 47, 0.5);
+      --accent-cyan: #00e5ff;
       --text-main: #ffffff;
-      --text-sub: #9499ad;
-      --green-glow: #00e676;
+      --text-sub: #82889a;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
@@ -27,44 +25,54 @@
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
+      position: relative;
+    }
+
+    /* AUTH OVERLAY (SIGNUP / LOGIN) */
+    .auth-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(10, 12, 16, 0.98);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* BACKGROUND ROBOT ANIMATION */
+    .bg-robot {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 110px;
+      opacity: 0.12;
+      animation: floatRobot 3s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 1;
+    }
+    @keyframes floatRobot {
+      0% { transform: translate(-50%, -40%) scale(1); }
+      100% { transform: translate(-50%, -60%) scale(1.1); }
     }
 
     /* HEADER */
     .header {
-      padding: 15px 20px 10px;
+      padding: 15px;
       text-align: center;
-      background: radial-gradient(circle at top, rgba(243, 186, 47, 0.15), transparent);
-    }
-    .balance-title {
-      font-size: 11px;
-      color: var(--text-sub);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
+      z-index: 2;
+      background: radial-gradient(circle at top, rgba(0, 229, 255, 0.1), transparent);
     }
     .balance-amount {
-      font-size: 38px;
+      font-size: 36px;
       font-weight: 900;
       color: var(--accent-gold);
-      text-shadow: 0 0 20px var(--accent-glow);
-      margin: 2px 0;
-    }
-    .badge-bar {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 5px;
-    }
-    .badge {
-      padding: 3px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: bold;
-      border: 1px solid var(--accent-gold);
-      background: rgba(243, 186, 47, 0.1);
-      color: var(--accent-gold);
+      text-shadow: 0 0 15px rgba(243, 186, 47, 0.4);
     }
 
-    /* MAIN CONTAINER & PAGES */
+    /* CONTENT & PAGES */
     .content {
       flex: 1;
       overflow-y: auto;
@@ -72,272 +80,198 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      z-index: 2;
     }
     .page { display: none; width: 100%; flex-direction: column; align-items: center; }
     .page.active { display: flex; }
 
-    /* CARDS & UI COMPONENTS */
+    /* CARDS & UI */
     .card {
       width: 100%;
       background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      border: 1px solid rgba(0, 229, 255, 0.2);
       border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 15px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
     }
-    .card h3 { color: var(--accent-gold); font-size: 18px; margin-bottom: 8px; }
-    .card p { color: var(--text-sub); font-size: 13px; line-height: 1.4; }
 
-    /* TAP COIN ANIMATION */
-    .tap-area { margin: 25px 0; }
+    /* ROBOT MINER COIN */
+    .tap-area { margin: 20px 0; position: relative; }
     .main-coin {
-      width: 210px;
-      height: 210px;
+      width: 200px;
+      height: 200px;
       border-radius: 50%;
-      background: radial-gradient(circle, #ffe066 0%, #f3ba2f 50%, #996d00 100%);
-      box-shadow: 0 0 40px var(--accent-glow), inset 0 0 15px #fff;
+      background: radial-gradient(circle, #00e5ff 0%, #005c8a 100%);
+      box-shadow: 0 0 35px rgba(0, 229, 255, 0.5);
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      transition: transform 0.08s ease;
-      animation: pulse 2s infinite alternate;
+      transition: transform 0.05s;
     }
     .main-coin:active { transform: scale(0.92); }
     .coin-inner { font-size: 80px; }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 25px var(--accent-glow); }
-      100% { box-shadow: 0 0 50px var(--accent-gold); }
-    }
 
-    /* VIP PLAN CARDS */
-    .vip-card {
-      width: 100%;
-      background: linear-gradient(135deg, #1e2430 0%, #12151c 100%);
-      border: 1px solid var(--accent-gold);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
+    /* PAYMENT MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+      justify-content: center;
       align-items: center;
+      padding: 20px;
     }
-    .vip-info h4 { font-size: 16px; color: var(--accent-gold); margin-bottom: 4px; }
-    .vip-info p { font-size: 12px; color: var(--text-sub); margin-bottom: 2px; }
 
     /* INPUTS & BUTTONS */
     .input-field {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 10px;
-      border: 1px solid #2a3040;
-      background: #0d0f14;
-      color: #fff;
-      text-align: center;
-      font-size: 14px;
+      width: 100%; padding: 12px; margin-top: 8px;
+      border-radius: 8px; border: 1px solid #252c3d;
+      background: #0a0c10; color: #fff; text-align: center;
     }
-    .btn-gold {
-      width: 100%;
-      padding: 13px;
-      margin-top: 12px;
-      border-radius: 10px;
-      border: none;
-      background: linear-gradient(90deg, #f3ba2f, #ff9900);
-      color: #000;
-      font-weight: 800;
-      font-size: 14px;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(243, 186, 47, 0.3);
-    }
-    .upi-box {
-      background: #0d0f14;
-      border: 1px dashed var(--accent-gold);
-      padding: 10px;
-      border-radius: 8px;
-      color: var(--accent-gold);
-      font-weight: bold;
-      margin: 10px 0;
-      font-size: 15px;
-      text-align: center;
+    .btn-action {
+      width: 100%; padding: 12px; margin-top: 10px;
+      border-radius: 8px; border: none;
+      background: linear-gradient(90deg, #00e5ff, #0077ff);
+      color: #000; font-weight: bold; cursor: pointer;
     }
 
-    /* BOTTOM NAVBAR */
+    /* NAVBAR */
     .navbar {
-      width: 100%;
-      background: #12151c;
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0 15px;
-      border-top: 1px solid #1e2430;
+      width: 100%; background: #0e1118; display: flex;
+      justify-content: space-around; padding: 10px 0 15px;
+      border-top: 1px solid #1a202c; z-index: 10;
     }
     .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: var(--text-sub);
-      font-size: 10px;
-      cursor: pointer;
-      font-weight: bold;
+      display: flex; flex-direction: column; align-items: center;
+      color: var(--text-sub); font-size: 10px; cursor: pointer;
     }
-    .nav-item.active { color: var(--accent-gold); }
-    .nav-icon { font-size: 20px; margin-bottom: 3px; }
+    .nav-item.active { color: var(--accent-cyan); }
   </style>
 </head>
 <body>
 
-  <!-- TOP HEADER -->
-  <div class="header">
-    <div class="balance-title">TOTAL MINING BALANCE</div>
-    <div class="balance-amount">₹<span id="balance">0.00</span></div>
-    <div class="badge-bar">
-      <div class="badge" id="vipBadge">VIP: NONE</div>
-      <div class="badge" id="leaderBadge" style="border-color:#00e676; color:#00e676;">LEADER: L0</div>
+  <!-- BACKGROUND TOY/ROBOT ANIMATION -->
+  <div class="bg-robot">🤖</div>
+
+  <!-- AUTH SCREEN (SIGNUP / LOGIN) -->
+  <div class="auth-overlay" id="authOverlay">
+    <div class="card" style="text-align:center;">
+      <h2 style="color:var(--accent-cyan); margin-bottom:10px;">🤖 Robot Miner Login</h2>
+      <input type="text" class="input-field" placeholder="Enter Username">
+      <input type="password" class="input-field" placeholder="Enter Password">
+      <button class="btn-action" onclick="handleAuth()">Login / Sign Up</button>
     </div>
   </div>
 
-  <!-- MAIN CONTENT AREA -->
+  <!-- MAIN HEADER -->
+  <div class="header">
+    <div style="font-size:11px; color:var(--text-sub);">ROBOT MINING BALANCE</div>
+    <div class="balance-amount">₹<span id="balance">0.00</span></div>
+  </div>
+
+  <!-- MAIN CONTENT -->
   <div class="content">
 
-    <!-- PAGE 1: MINING DASHBOARD -->
+    <!-- PAGE 1: MINING -->
     <div id="page-mining" class="page active">
-      <!-- Unpaid Warning Card -->
-      <div class="card" id="lockNotice">
-        <h3>🔒 Plan Locked</h3>
-        <p>Buy VIP Plan to unlock Tap-Mining & Daily Automated Income!</p>
+      <div class="card" style="text-align:center;" id="lockCard">
+        <h3 style="color:var(--accent-gold);">🔒 Mining Status: LOCKED</h3>
+        <p style="font-size:12px; color:var(--text-sub);">Buy VIP Plan to start 24/7 Robot Mining!</p>
       </div>
 
-      <!-- Tap Area (Active only when plan is bought) -->
       <div class="tap-area">
-        <div class="main-coin" onclick="handleTap()">
-          <div class="coin-inner">👑</div>
+        <div class="main-coin" onclick="tapCoin()">
+          <div class="coin-inner">🤖</div>
         </div>
       </div>
-      <p style="font-size: 12px; color: var(--text-sub);">Tap the Crown to Mine Real Cash</p>
     </div>
 
     <!-- PAGE 2: VIP PLANS -->
     <div id="page-vip" class="page">
-      
-      <!-- VIP 1 -->
-      <div class="vip-card">
-        <div class="vip-info">
-          <h4>VIP 1 PLAN</h4>
-          <p>Price: <strong>₹2,000</strong></p>
-          <p>Daily Profit: <strong>₹50 / day</strong></p>
-          <p style="color:var(--green-glow);">Validity: 1 Year (365 Days)</p>
-        </div>
-        <button class="btn-gold" style="width: auto; padding: 10px 15px;" onclick="selectVIP(2000, 'VIP 1')">Buy VIP 1</button>
-      </div>
-
-      <!-- VIP 2 -->
-      <div class="vip-card">
-        <div class="vip-info">
-          <h4>VIP 2 PLAN</h4>
-          <p>Price: <strong>₹5,000</strong></p>
-          <p>Daily Profit: <strong>₹120 / day</strong></p>
-          <p style="color:var(--green-glow);">Validity: 1 Year (365 Days)</p>
-        </div>
-        <button class="btn-gold" style="width: auto; padding: 10px 15px;" onclick="selectVIP(5000, 'VIP 2')">Buy VIP 2</button>
-      </div>
-
-      <!-- Payment UTR Submit Modal/Card -->
-      <div class="card" id="paymentSection" style="margin-top: 10px;">
-        <h3>Deposit Payment (UPI)</h3>
-        <p>Scan/Pay to UPI ID below & enter 12-Digit UTR:</p>
-        
-        <!-- PASTE YOUR UPI ID HERE -->
-        <div class="upi-box">YOUR_UPI_ID_HERE</div>
-
-        <input type="text" class="input-field" id="utrInput" placeholder="Enter 12-Digit UTR Number">
-        <button class="btn-gold" onclick="submitUTR()">Submit UTR for Verification</button>
-      </div>
-
-    </div>
-
-    <!-- PAGE 3: DAILY CODE -->
-    <div id="page-code" class="page">
       <div class="card">
-        <h3>🔑 Daily Cipher Bonus</h3>
-        <p>Enter today's secret admin code to unlock daily earning rewards!</p>
-        <input type="text" class="input-field" id="cipherCode" placeholder="Enter Secret Daily Code">
-        <button class="btn-gold" onclick="claimDailyCode()">Activate Daily Earning</button>
+        <h3>VIP 1 PLAN - ₹2,000</h3>
+        <p>Daily Profit: ₹50/day | 1 Year Validity</p>
+        <button class="btn-action" onclick="openPayment('VIP 1', 2000)">Buy VIP 1</button>
       </div>
-    </div>
 
-    <!-- PAGE 4: FRIENDS & LEADER -->
-    <div id="page-friends" class="page">
       <div class="card">
-        <h3>👥 Refer & Level Leader</h3>
-        <p>Invite <strong>4 friends</strong> who join to become a <strong>Level 1 Leader</strong>!</p>
-        <br>
-        <p><strong>Your Referrals:</strong> <span id="refCount" style="color:var(--accent-gold);">0</span> / 4 Friends</p>
-        <input type="text" class="input-field" id="refLink" value="https://t.me/YourBot?start=ref123" readonly>
-        <button class="btn-gold" onclick="copyReferral()">Copy Invite Link</button>
+        <h3>VIP 2 PLAN - ₹5,000</h3>
+        <p>Daily Profit: ₹120/day | 1 Year Validity</p>
+        <button class="btn-action" onclick="openPayment('VIP 2', 5000)">Buy VIP 2</button>
       </div>
     </div>
 
-    <!-- PAGE 5: WITHDRAW -->
-    <div id="page-withdraw" class="page">
-      <div class="card">
-        <h3>💸 Instant Cash Withdrawal</h3>
-        <p>Enter your Bank / UPI details for withdrawal:</p>
-        <input type="text" class="input-field" placeholder="Enter Account / UPI Holder Name">
-        <input type="text" class="input-field" placeholder="Enter UPI ID / Bank A/C Number">
-        <input type="number" class="input-field" placeholder="Enter Amount (Min ₹100)">
-        <button class="btn-gold" onclick="requestWithdrawal()">Request Cashout</button>
-      </div>
-    </div>
-
-    <!-- PAGE 6: PROFILE -->
+    <!-- PAGE 3: PROFILE & EXTRA OPTIONS -->
     <div id="page-profile" class="page">
       <div class="card">
-        <h3>👤 User Profile & Status</h3>
-        <p style="margin-top:8px;"><strong>Telegram ID:</strong> <span id="profId">12345678</span></p>
-        <p style="margin-top:5px;"><strong>VIP Level:</strong> <span id="profVIP" style="color:var(--accent-gold);">Free Member</span></p>
-        <p style="margin-top:5px;"><strong>Leader Rank:</strong> <span id="profLeader" style="color:var(--green-glow);">Member</span></p>
-        <p style="margin-top:5px;"><strong>Account Validity:</strong> <span id="profValidity">N/A</span></p>
+        <h3>👤 Profile & Account</h3>
+        <p>Status: <strong style="color:var(--accent-cyan);" id="userVIP">Free Member</strong></p>
       </div>
+
+      <div class="card">
+        <h3>🔑 Reception Code</h3>
+        <input type="text" class="input-field" placeholder="Enter Reception Code">
+        <button class="btn-action" onclick="alert('Code Redeemed!')">Redeem</button>
+      </div>
+
+      <div class="card">
+        <h3>📊 Withdrawal Status</h3>
+        <p style="font-size:12px; color:var(--text-sub);">Last Status: <strong style="color:var(--accent-gold);">No Requests</strong></p>
+      </div>
+
+      <button class="btn-action" style="background:#ff3366; color:#fff;" onclick="handleLogout()">Logout</button>
     </div>
 
+  </div>
+
+  <!-- VIP PAYMENT MODAL POPUP -->
+  <div class="modal" id="paymentModal">
+    <div class="card" style="text-align:center;">
+      <h3 id="modalTitle">Pay for VIP</h3>
+      <p style="font-size:12px; color:var(--text-sub); margin-top:5px;">Pay via UPI & Submit 12-Digit UTR:</p>
+      
+      <!-- PASTE YOUR UPI ID HERE -->
+      <div style="background:#0a0c10; padding:10px; border:1px dashed var(--accent-cyan); color:var(--accent-cyan); margin:10px 0; border-radius:8px;">
+        YOUR_UPI_ID_HERE
+      </div>
+
+      <input type="text" class="input-field" id="utrInput" placeholder="Enter 12-Digit UTR">
+      <button class="btn-action" onclick="submitUTR()">Submit Payment UTR</button>
+      <button class="btn-action" style="background:#333; color:#fff; margin-top:5px;" onclick="closeModal()">Close</button>
+    </div>
   </div>
 
   <!-- BOTTOM NAVBAR -->
   <div class="navbar">
     <div class="nav-item active" onclick="switchPage('page-mining', this)">
-      <div class="nav-icon">⛏️</div>
+      <div>⛏️</div>
       <div>Mining</div>
     </div>
     <div class="nav-item" onclick="switchPage('page-vip', this)">
-      <div class="nav-icon">👑</div>
+      <div>👑</div>
       <div>VIP Plans</div>
     </div>
-    <div class="nav-item" onclick="switchPage('page-code', this)">
-      <div class="nav-icon">🔑</div>
-      <div>Daily Code</div>
-    </div>
-    <div class="nav-item" onclick="switchPage('page-friends', this)">
-      <div class="nav-icon">👥</div>
-      <div>Friends</div>
-    </div>
-    <div class="nav-item" onclick="switchPage('page-withdraw', this)">
-      <div class="nav-icon">💸</div>
-      <div>Withdraw</div>
-    </div>
     <div class="nav-item" onclick="switchPage('page-profile', this)">
-      <div class="nav-icon">👤</div>
+      <div>👤</div>
       <div>Profile</div>
     </div>
   </div>
 
   <script>
+    let isPaid = false;
     let userBalance = 0.00;
-    let isPlanPaid = false;
-    let friendsCount = 0;
-    let selectedPlan = "";
 
-    // NAVIGATION SYSTEM
+    function handleAuth() {
+      document.getElementById('authOverlay').style.display = 'none';
+    }
+
+    function handleLogout() {
+      document.getElementById('authOverlay').style.display = 'flex';
+    }
+
     function switchPage(pageId, element) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -345,84 +279,30 @@
       element.classList.add('active');
     }
 
-    // TAP MINING LOGIC
-    function handleTap() {
-      if(!isPlanPaid) {
-        alert("🔒 Please buy VIP 1 or VIP 2 Plan to start tapping and earning!");
+    function openPayment(planName, price) {
+      document.getElementById('modalTitle').innerText = `Pay for ${planName} (₹${price})`;
+      document.getElementById('paymentModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('paymentModal').style.display = 'none';
+    }
+
+    function submitUTR() {
+      const utr = document.getElementById('utrInput').value;
+      if(utr.length < 10) { alert('Enter valid UTR'); return; }
+      alert('UTR Submitted! Verification Pending.');
+      closeModal();
+    }
+
+    function tapCoin() {
+      if(!isPaid) {
+        alert("🔒 Buy VIP Plan to start mining!");
         switchPage('page-vip', document.querySelectorAll('.nav-item')[1]);
         return;
       }
-      userBalance += 0.50;
+      userBalance += 1;
       document.getElementById('balance').innerText = userBalance.toFixed(2);
-    }
-
-    // VIP PLAN SELECTION
-    function selectVIP(amount, planName) {
-      selectedPlan = planName;
-      alert(`To activate ${planName}, please pay ₹${amount} on the UPI ID below and submit UTR.`);
-    }
-
-    // SUBMIT UTR
-    function submitUTR() {
-      const utr = document.getElementById('utrInput').value;
-      if(utr.length < 10) {
-        alert("Please enter a valid 12-digit UTR number!");
-        return;
-      }
-      alert("Payment UTR submitted! Admin will verify and activate your VIP Plan shortly.");
-    }
-
-    // DAILY CODE LOGIC
-    function claimDailyCode() {
-      const code = document.getElementById('cipherCode').value;
-      if(!isPlanPaid) {
-        alert("Active VIP Plan required to claim Daily Code profits!");
-        return;
-      }
-      if(code === "PROFIT50" || code === "PROFIT120") {
-        let reward = code === "PROFIT50" ? 50 : 120;
-        userBalance += reward;
-        document.getElementById('balance').innerText = userBalance.toFixed(2);
-        alert(`🎉 Success! ₹${reward} Daily Profit added to your balance.`);
-      } else {
-        alert("Invalid Secret Code!");
-      }
-    }
-
-    // REFERRAL LINK COPY
-    function copyReferral() {
-      const copyText = document.getElementById("refLink");
-      copyText.select();
-      navigator.clipboard.writeText(copyText.value);
-      alert("Invite link copied to clipboard!");
-    }
-
-    // WITHDRAWAL REQUEST
-    function requestWithdrawal() {
-      if(userBalance < 100) {
-        alert("Minimum withdrawal limit is ₹100.");
-        return;
-      }
-      alert("Withdrawal request submitted! Processing will take up to 24 hours.");
-    }
-
-    // DEMO UNLOCK FUNCTION (Called when database plan_status = Paid)
-    function activateVIPUser(planType) {
-      isPlanPaid = true;
-      document.getElementById('lockNotice').style.display = 'none';
-      document.getElementById('vipBadge').innerText = planType;
-      document.getElementById('profVIP').innerText = planType;
-      document.getElementById('profValidity').innerText = "365 Days Remaining";
-    }
-
-    // DEMO LEADER UNLOCK FUNCTION (Triggered on 4 friends)
-    function updateLeaderStatus(count) {
-      friendsCount = count;
-      document.getElementById('refCount').innerText = friendsCount;
-      if(friendsCount >= 4) {
-        document.getElementById('leaderBadge').innerText = "LEADER: LEVEL 1";
-        document.getElementById('profLeader').innerText = "Level 1 Leader";
-      }
     }
   </script>
 </body>
