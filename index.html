@@ -96,7 +96,6 @@
     .info-section { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; margin-top: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
     .info-title { font-size: 16px; font-weight: bold; color: var(--gold-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
     .info-p { font-size: 13px; color: #d1d1d6; line-height: 1.6; margin-bottom: 14px; text-align: justify; }
-    .info-p:last-child { margin-bottom: 0; }
 
     /* DEVICE MARKET PAGE */
     .white-container { background: var(--gold-card); color: var(--card-text); border-radius: 28px; padding: 22px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); border: 1px solid rgba(243, 186, 47, 0.5); position: relative; }
@@ -116,7 +115,11 @@
 
     .control-btns { display: flex; gap: 15px; width: 100%; margin-top: 30px; }
     .btn-start { flex: 1; background: var(--gold-gradient); padding: 16px; border-radius: 20px; border: none; color: #000; font-weight: bold; font-size: 16px; box-shadow: 0 4px 20px var(--gold-glow); cursor: pointer; }
-    .btn-receive { flex: 1; background: #ffffff; padding: 16px; border-radius: 20px; border: none; color: #000; font-weight: bold; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(255,255,255,0.2); }
+
+    /* LOCKED SYSTEM WARNING BOX */
+    .locked-box { background: var(--glass-bg); border: 1px solid var(--gold-primary); border-radius: 24px; padding: 25px; text-align: center; margin-top: 20px; }
+    .locked-box h3 { color: var(--gold-primary); font-size: 18px; margin-bottom: 10px; }
+    .locked-box p { color: #ccc; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
 
     /* INVITE PAGE */
     .qr-card { text-align: center; background: #ffffff; color: #000; border-radius: 28px; padding: 25px 20px; border: 2px solid var(--gold-primary); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -146,7 +149,7 @@
 </head>
 <body>
 
-  <!-- ANIMATED BACKGROUND PARTICLES -->
+  <!-- BACKGROUND PARTICLES -->
   <div class="bg-particles">
     <div class="particle p1"></div>
     <div class="particle p2"></div>
@@ -184,16 +187,12 @@
         <div style="margin-left:auto; color: var(--gold-primary);">→</div>
       </div>
 
-      <!-- NOBI MINING PARAGRAPHS -->
       <div class="info-section">
         <div class="info-title"><span>🚀</span> About Nobi AI Ecosystem</div>
-        <p class="info-p">Nobi Mining is a next-generation AI-powered cloud mining infrastructure designed to deliver steady, automated daily returns for all users. By leveraging decentralized computing nodes, Nobi allows participants to harness high-performance hardware seamlessly without needing physical setup or technical expertise.</p>
+        <p class="info-p">Nobi Mining is a next-generation AI-powered cloud mining infrastructure designed to deliver steady, automated daily returns for all users.</p>
         
         <div class="info-title"><span>⚡</span> Automated Robot Operations</div>
-        <p class="info-p">Our VIP Robotic units execute real-time algorithmic tasks that optimize mining yield every 24 hours. Users can activate their specialized nodes using daily redemption keys, ensuring a secure and transparent reward mechanism tailored directly to their activated subscription tiers.</p>
-        
-        <div class="info-title"><span>🛡️</span> Fast Payments & High Security</div>
-        <p class="info-p">With an emphasis on user liquidity, Nobi provides seamless UPI recharge options and instant withdrawal processing. Backed by encrypted cloud storage and distributed ledgers, your assets and daily yields remain protected round the clock.</p>
+        <p class="info-p">Our VIP Robotic units execute real-time algorithmic tasks that optimize mining yield every 24 hours.</p>
       </div>
     </div>
 
@@ -216,16 +215,25 @@
 
     <!-- ENERGY / MINING PAGE -->
     <div id="page-energy" class="page">
-      <div class="terminal-toggle"><div class="toggle-btn active">Running</div><div class="toggle-btn">Closed</div></div>
-      <div class="robot-display"><div style="font-size: 90px;" id="activeMiningRobotIcon">🤖</div></div>
-      <div style="text-align: center;">
-        <h2 id="activeRobotName" style="font-size: 22px; font-weight: bold; color: var(--gold-primary);">Nobi 10 Robot</h2>
-        <p style="font-size: 12px; opacity: 0.7; margin-top: 4px;">Current gross income</p>
-        <h1 style="font-size: 32px; color: #ffe066; margin-top: 6px;" id="liveGrossIncome">₹0.00</h1>
+      <!-- DYNAMIC CONTENT: UNLOCKED MINING VS LOCKED WARNING -->
+      <div id="unlockedMiningSection" style="display: none;">
+        <div class="terminal-toggle"><div class="toggle-btn active">Running</div><div class="toggle-btn">Closed</div></div>
+        <div class="robot-display"><div style="font-size: 90px;" id="activeMiningRobotIcon">🤖</div></div>
+        <div style="text-align: center;">
+          <h2 id="activeRobotName" style="font-size: 22px; font-weight: bold; color: var(--gold-primary);">Nobi 10 Robot</h2>
+          <p style="font-size: 12px; opacity: 0.7; margin-top: 4px;">Current gross income</p>
+          <h1 style="font-size: 32px; color: #ffe066; margin-top: 6px;" id="liveGrossIncome">₹0.00</h1>
+        </div>
+        <div class="control-btns">
+          <button class="btn-start" onclick="openStartModal()">⚡ Start Mining Code</button>
+        </div>
       </div>
-      <div class="control-btns">
-        <button class="btn-start" onclick="openStartModal()">⚡ Start Mining</button>
-        <button class="btn-receive" onclick="receiveIncome()">💰 Receive</button>
+
+      <div id="lockedMiningSection" class="locked-box" style="display: none;">
+        <div style="font-size: 50px; margin-bottom: 10px;">🔒</div>
+        <h3>Mining System Locked</h3>
+        <p>Aapke paas filhal koi Active Mining Robot nahi hai.<br>Mining start karne ke liye Device Market se robot buy karein.</p>
+        <button class="btn-gold" onclick="switchPage('page-device', document.querySelectorAll('.nav-item')[1])">Buy Robot Now</button>
       </div>
     </div>
 
@@ -247,7 +255,7 @@
       <div class="profile-header">
         <div class="profile-top">
           <div>
-            <span class="vip-tag" id="userVipTag">Nobi 10</span>
+            <span class="vip-tag" id="userVipTag">No Active Device</span>
             <h2 style="font-size: 22px; margin-top: 6px;" id="profileUsername">User</h2>
             <p style="font-size: 12px; color: #666;" id="profileMaskedId">(****0000)</p>
           </div>
@@ -261,7 +269,6 @@
       </div>
       <div class="menu-list">
         <div class="menu-row" onclick="openStartModal()"><span>🎁 Redemption Code</span><span>→</span></div>
-        <div class="menu-row" onclick="alert('Wallet Address Configured.')"><span>💼 Wallet Address</span><span>→</span></div>
         <div class="menu-row" onclick="logout()" style="color: #ff3b30;"><span>🚪 Log out</span><span>→</span></div>
       </div>
     </div>
@@ -318,9 +325,7 @@
 
     let currentUser = null;
     let isSignupMode = false;
-    let uncollectedMining = 0;
 
-    // AUTO-LOGIN CHECK ON LOAD
     window.addEventListener('DOMContentLoaded', () => {
       const savedUser = localStorage.getItem('nobi_user');
       if (savedUser) {
@@ -342,12 +347,12 @@
       if (!mobile || !pass) { alert("Please enter credentials!"); return; }
 
       if (isSignupMode) {
-        const { error } = await _supabase.from('users').insert([{ telegram_id: mobile, balance: 0.00, plan_status: 'Nobi 10' }]);
+        const { error } = await _supabase.from('users').insert([{ telegram_id: mobile, balance: 0.00, plan_status: 'None' }]);
         if (error) {
           alert("Error: " + error.message);
         } else {
           alert("Account Created! Logging in...");
-          let newUserData = { telegram_id: mobile, balance: 0.00, plan_status: 'Nobi 10' };
+          let newUserData = { telegram_id: mobile, balance: 0.00, plan_status: 'None' };
           currentUser = newUserData;
           localStorage.setItem('nobi_user', JSON.stringify(newUserData));
           loginSuccess(newUserData);
@@ -369,10 +374,20 @@
       document.getElementById('displayTgName').innerText = user.telegram_id;
       document.getElementById('profileUsername').innerText = user.telegram_id;
       
-      let userPlan = user.plan_status || 'Nobi 10';
-      document.getElementById('userVipTag').innerText = userPlan;
-      document.getElementById('activeRobotName').innerText = userPlan + " Robot";
+      let userPlan = user.plan_status || 'None';
       
+      // LOGIC: CHECK IF USER HAS BUYED DEVICE OR NOT
+      if (userPlan === 'None' || !userPlan) {
+        document.getElementById('userVipTag').innerText = "No Active Device";
+        document.getElementById('unlockedMiningSection').style.display = 'none';
+        document.getElementById('lockedMiningSection').style.display = 'block';
+      } else {
+        document.getElementById('userVipTag').innerText = userPlan;
+        document.getElementById('activeRobotName').innerText = userPlan + " Robot";
+        document.getElementById('unlockedMiningSection').style.display = 'block';
+        document.getElementById('lockedMiningSection').style.display = 'none';
+      }
+
       updateUIBalances(user.balance || 0);
 
       let userNumStr = String(user.telegram_id);
@@ -391,8 +406,15 @@
       document.getElementById('statTotal').innerText = formattedBal;
     }
 
-    function openStartModal() { openModal('miningCodeModal'); }
+    function openStartModal() {
+      if (!currentUser || currentUser.plan_status === 'None' || !currentUser.plan_status) {
+        alert("Please buy a device first to activate mining!");
+        return;
+      }
+      openModal('miningCodeModal');
+    }
 
+    // DIRECT DATABASE UPDATE MINING CODE
     async function verifyAndStartMining() {
       let enteredCode = document.getElementById('miningCodeInput').value.trim();
       if (!enteredCode) { alert("Please enter an activation code!"); return; }
@@ -409,66 +431,107 @@
       } else {
         let userPlan = currentUser ? currentUser.plan_status : 'Nobi 10';
         let dailyReward = (userPlan === 'Nobi 50') ? 120.00 : 50.00;
+        
+        let currentBalance = parseFloat(currentUser ? currentUser.balance : 0);
+        let newBalance = currentBalance + dailyReward;
 
-        uncollectedMining += dailyReward;
-        document.getElementById('liveGrossIncome').innerText = "₹" + uncollectedMining.toFixed(2);
-        
+        const { error: updateError } = await _supabase
+          .from('users')
+          .update({ balance: newBalance })
+          .eq('telegram_id', currentUser.telegram_id);
+
+        if (updateError) {
+          alert("Error updating balance: " + updateError.message);
+          return;
+        }
+
         await _supabase.from('daily_codes').update({ is_used: true }).eq('id', data.id);
-        
-        alert("Code Activated Successfully! ₹" + dailyReward.toFixed(2) + " generated.");
+
+        currentUser.balance = newBalance;
+        localStorage.setItem('nobi_user', JSON.stringify(currentUser));
+
+        updateUIBalances(newBalance);
+        document.getElementById('statToday').innerText = "₹" + dailyReward.toFixed(2);
+        document.getElementById('liveGrossIncome').innerText = "₹" + dailyReward.toFixed(2);
+
+        alert("Code Activated! ₹" + dailyReward.toFixed(2) + " added to your account!");
         closeModal('miningCodeModal');
         document.getElementById('miningCodeInput').value = '';
       }
     }
 
-    async function receiveIncome() {
-      if (uncollectedMining <= 0) { alert("No income to collect right now."); return; }
-      let currentBalance = parseFloat(currentUser ? currentUser.balance : 0);
-      let newBalance = currentBalance + uncollectedMining;
-
-      if (currentUser) {
-        const { error } = await _supabase.from('users').update({ balance: newBalance }).eq('telegram_id', currentUser.telegram_id);
-        if (error) { alert("Error collecting income: " + error.message); return; }
-        currentUser.balance = newBalance;
-        localStorage.setItem('nobi_user', JSON.stringify(currentUser));
-      }
-
-      updateUIBalances(newBalance);
-      document.getElementById('statToday').innerText = "₹" + uncollectedMining.toFixed(2);
-      alert("Successfully Received ₹" + uncollectedMining.toFixed(2) + "!");
-      uncollectedMining = 0;
-      document.getElementById('liveGrossIncome').innerText = "₹0.00";
-    }
-
+    // UTR SUBMISSION (RECHARGE ONLY)
     async function submitUTR() {
       let utr = document.getElementById('utrInput').value.trim();
       if (!utr || utr.length < 10) { alert("Valid 12-digit UTR required!"); return; }
-      const { error } = await _supabase.from('recharges').insert([{ telegram_id: currentUser ? currentUser.telegram_id : 'Guest', utr_number: utr, status: 'Pending' }]);
-      if (error) alert("Error: " + error.message); else { alert("Recharge Submitted!"); closeModal('paymentModal'); }
+      
+      const { error } = await _supabase.from('recharges').insert([{ 
+        telegram_id: currentUser ? currentUser.telegram_id : 'Guest', 
+        utr_number: utr, 
+        status: 'Pending' 
+      }]);
+
+      if (error) {
+        alert("Error: " + error.message);
+      } else {
+        alert("Recharge Submitted Successfully! Once approved, balance will show in your profile."); 
+        closeModal('paymentModal');
+        document.getElementById('utrInput').value = '';
+      }
+    }
+
+    // BUY ROBOT WITH PROFILE BALANCE
+    async function buyRobot(name, price) {
+      if (!currentUser) { alert("Please login first!"); return; }
+      
+      let currentBal = parseFloat(currentUser.balance || 0);
+      
+      if (currentBal >= price) {
+        let newBal = currentBal - price;
+        const { error } = await _supabase.from('users').update({ 
+          balance: newBal, 
+          plan_status: name 
+        }).eq('telegram_id', currentUser.telegram_id);
+
+        if (!error) {
+          currentUser.balance = newBal; 
+          currentUser.plan_status = name;
+          localStorage.setItem('nobi_user', JSON.stringify(currentUser));
+          
+          updateUIBalances(newBal); 
+          document.getElementById('userVipTag').innerText = name; 
+          document.getElementById('activeRobotName').innerText = name + " Robot";
+          
+          // UNLOCK MINING UI
+          document.getElementById('unlockedMiningSection').style.display = 'block';
+          document.getElementById('lockedMiningSection').style.display = 'none';
+
+          alert("SUCCESSFUL BUY! " + name + " has been activated.");
+        } else { 
+          alert("Error: " + error.message); 
+        }
+      } else { 
+        alert("Insufficient Balance! Please Recharge first and submit UTR."); 
+        openModal('paymentModal'); 
+      }
     }
 
     async function submitWithdraw() {
       let amt = parseFloat(document.getElementById('withdrawAmtInput').value);
       if (isNaN(amt) || amt < 650) { alert("Minimum withdrawal is ₹650!"); return; }
       if (currentUser && currentUser.balance < amt) { alert("Insufficient Balance!"); return; }
-      const { error } = await _supabase.from('withdrawals').insert([{ telegram_id: currentUser ? currentUser.telegram_id : 'Guest', amount: amt, account_name: document.getElementById('wHolderName').value, upi_id: document.getElementById('wUpiId').value, bank_account: document.getElementById('wAccNum').value, ifsc_code: document.getElementById('wIfsc').value, status: 'Pending' }]);
-      if (error) alert("Error: " + error.message); else { alert("Withdrawal Submitted!"); closeModal('withdrawModal'); }
-    }
+      
+      const { error } = await _supabase.from('withdrawals').insert([{ 
+        telegram_id: currentUser ? currentUser.telegram_id : 'Guest', 
+        amount: amt, 
+        account_name: document.getElementById('wHolderName').value, 
+        upi_id: document.getElementById('wUpiId').value, 
+        bank_account: document.getElementById('wAccNum').value, 
+        ifsc_code: document.getElementById('wIfsc').value, 
+        status: 'Pending' 
+      }]);
 
-    async function buyRobot(name, price) {
-      if (currentUser && currentUser.balance >= price) {
-        let newBal = currentUser.balance - price;
-        const { error } = await _supabase.from('users').update({ balance: newBal, plan_status: name }).eq('telegram_id', currentUser.telegram_id);
-        if (!error) {
-          currentUser.balance = newBal; 
-          currentUser.plan_status = name;
-          localStorage.setItem('nobi_user', JSON.stringify(currentUser));
-          updateUIBalances(newBal); 
-          document.getElementById('userVipTag').innerText = name; 
-          document.getElementById('activeRobotName').innerText = name + " Robot";
-          alert(name + " Purchased!");
-        } else { alert("Error: " + error.message); }
-      } else { alert("Insufficient Balance!"); openModal('paymentModal'); }
+      if (error) alert("Error: " + error.message); else { alert("Withdrawal Submitted!"); closeModal('withdrawModal'); }
     }
 
     function copyInviteLink() { let copyText = document.getElementById("refLinkInput"); copyText.select(); navigator.clipboard.writeText(copyText.value); alert("Copied!"); }
