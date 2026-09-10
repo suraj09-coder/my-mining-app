@@ -416,49 +416,35 @@
 
     // DIRECT DATABASE UPDATE MINING CODE
     async function verifyAndStartMining() {
-      let enteredCode = document.getElementById('miningCodeInput').value.trim();
-      if (!enteredCode) { alert("Please enter an activation code!"); return; }
+  let enteredCode = document.getElementById('miningCodeInput').value.trim();
+  if (!enteredCode) { alert("Please enter an activation code!"); return; }
 
-      const { data, error } = await _supabase
-        .from('daily_codes')
-        .select('*')
-        .eq('code', enteredCode)
-        .eq('is_used', false)
-        .single();
+  // Call Supabase Database Function
+  const { data, error } = await _supabase.rpc('redeem_mining_code', {
+    user_id: currentUser ? currentUser.telegram_id : '',
+    code_text: enteredCode
+  });
 
-      if (error || !data) {
-        alert("Invalid or Expired Activation Code!");
-      } else {
-        let userPlan = currentUser ? currentUser.plan_status : 'Nobi 10';
-        let dailyReward = (userPlan === 'Nobi 50') ? 120.00 : 50.00;
-        
-        let currentBalance = parseFloat(currentUser ? currentUser.balance : 0);
-        let newBalance = currentBalance + dailyReward;
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
 
-        const { error: updateError } = await _supabase
-          .from('users')
-          .update({ balance: newBalance })
-          .eq('telegram_id', currentUser.telegram_id);
+  if (data.success) {
+    currentUser.balance = data.new_balance;
+    localStorage.setItem('nobi_user', JSON.stringify(currentUser));
 
-        if (updateError) {
-          alert("Error updating balance: " + updateError.message);
-          return;
-        }
+    updateUIBalances(data.new_balance);
+    document.getElementById('statToday').innerText = "₹" + data.reward.toFixed(2);
+    document.getElementById('liveGrossIncome').innerText = "₹" + data.reward.toFixed(2);
 
-        await _supabase.from('daily_codes').update({ is_used: true }).eq('id', data.id);
-
-        currentUser.balance = newBalance;
-        localStorage.setItem('nobi_user', JSON.stringify(currentUser));
-
-        updateUIBalances(newBalance);
-        document.getElementById('statToday').innerText = "₹" + dailyReward.toFixed(2);
-        document.getElementById('liveGrossIncome').innerText = "₹" + dailyReward.toFixed(2);
-
-        alert("Code Activated! ₹" + dailyReward.toFixed(2) + " added to your account!");
-        closeModal('miningCodeModal');
-        document.getElementById('miningCodeInput').value = '';
-      }
-    }
+    alert("Code Activated! ₹" + data.reward.toFixed(2) + " added to your account!");
+    closeModal('miningCodeModal');
+    document.getElementById('miningCodeInput').value = '';
+  } else {
+    alert(data.message);
+  }
+}
 
     // UTR SUBMISSION (RECHARGE ONLY)
     async function submitUTR() {
